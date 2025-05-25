@@ -1,22 +1,24 @@
 import { useAuthContext } from "@/shared/context/authContex";
 import { Navigate } from "react-router-dom";
+import type { Roles } from "@/shared/enum/enum";
+import LoadingSpinner from "@/features/redirect/pages/Loading";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  allowedRoles?: string[];
+  allowedRoles?: Roles[];
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const { user, isAuthenticated, isLoading } = useAuthContext();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingSpinner/>; 
 
   if (!isAuthenticated) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user?.role || "")) {
-    return <Navigate to="/dashboard" />;
+  if (!user || (allowedRoles && !allowedRoles.includes(user.role as Roles))) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return <>{children}</>;

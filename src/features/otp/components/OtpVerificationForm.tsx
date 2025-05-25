@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,14 +8,18 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/shared/components/ui/card";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp";
+} from "@/shared/components/ui/input-otp";
 import { CheckCircle2, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/shared/components/ui/alert";
 import { useOtp } from "../hooks/useOtp";
 import { useZodForm } from "@/shared/hooks/useZodForm";
 import { OtpSchema } from "../utils/zod.schema";
@@ -115,7 +119,7 @@ export default function OtpVerificationForm() {
     handleChange("email", storedEmail);
     try {
       const data = await resendOtp(userId, storedEmail);
-      window.location.reload()
+      window.location.reload();
       if (data?.expiry_time) {
         setExpiryTime(new Date(data.expiry_time).getTime());
         resetForm();
@@ -192,7 +196,9 @@ export default function OtpVerificationForm() {
                   <button
                     type="button"
                     onClick={handleResendCode}
-                    className= {`p-0 h-auto bg-transparent text-primary font-medium text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed ${remainingTime <= 0 && "cursor-pointer"}`}
+                    className={`p-0 h-auto bg-transparent text-primary font-medium text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed ${
+                      remainingTime <= 0 && "cursor-pointer"
+                    }`}
                     disabled={remainingTime < 0}
                   >
                     {remainingTime > 0
