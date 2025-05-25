@@ -16,7 +16,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
-  const [accessToken, setAccessToken] = useState<string | null>(() => Cookies.get("access_token") || null);
+  const [accessToken, setAccessToken] = useState<string | null>(
+    () => Cookies.get("access_token") || null
+  );
 
   const login = useCallback((user: User, accessToken: string) => {
     setUser(user);
@@ -90,9 +92,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const result = await refreshAccessToken();
           updateAccessToken(result.access_token);
-        } catch (err:any) {
+        } catch (err: any) {
           logout();
-          throw new Error(err.message)
+          throw new Error(err.message);
         }
       }
     }, 1000);
@@ -105,10 +107,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       login,
       logout,
       updateAccessToken,
+      accessToken,
       isAuthenticated: !!user,
       isLoading,
     }),
-    [user, login, logout, updateAccessToken, isLoading]
+    [user, login, logout, updateAccessToken, accessToken, isLoading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,9 +6,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/shared/components/ui/card";
+import { Input } from "@/shared/components/ui/input";
+import { Label } from "@/shared/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { signInSchema } from "../utils/zod.schema";
 import { useZodForm } from "@/shared/hooks/useZodForm";
@@ -55,7 +55,7 @@ export default function SignInForm() {
           email: res.data.email,
           name: res.data.name,
         };
-        const token = {access_token: res.access_token};
+        const token = { access_token: res.access_token };
         if (!token) {
           throw new Error("Access token is missing in the response");
         }
@@ -69,7 +69,7 @@ export default function SignInForm() {
             color: "white",
           },
         });
-        navigate(res.data.role === "CUSTOMER" ? "/" : "/admin", {
+        navigate(res.data.role === "CUSTOMER" ? "/" : "/dashboard", {
           replace: true,
         });
       } else {
