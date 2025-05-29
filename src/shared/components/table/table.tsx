@@ -52,7 +52,6 @@ import { Button } from "@/shared/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -65,6 +64,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
+import { Input } from "@/shared/components/ui/input"; 
 
 interface DataTableProps<T> {
   data: T[];
@@ -92,7 +92,7 @@ export function DataTable<T extends object>({
   onAddSectionClick,
   noDataMessage = "No results.",
   customizeColumnsLabel = "Customize Columns",
-  addSectionLabel = "Create New User",
+  addSectionLabel,
   tabs = [
     {
       value: "outline",
@@ -113,6 +113,7 @@ export function DataTable<T extends object>({
     pageIndex: 0,
     pageSize: initialPageSize,
   });
+  const [searchTerm, setSearchTerm] = React.useState("");
 
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -137,10 +138,7 @@ export function DataTable<T extends object>({
     },
     getRowId: (row) => {
       const id = row[rowIdKey];
-      if (!id) {
-        return `fallback-${Math.random()}`;
-      }
-      return String(id);
+      return id ? String(id) : `fallback-${Math.random()}`;
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -169,11 +167,29 @@ export function DataTable<T extends object>({
     }
   }
 
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      table.setColumnFilters((prev) => {
+        const otherFilters = prev.filter((f) => f.id !== "name");
+        if (!searchTerm) return otherFilters;
+        return [...otherFilters, { id: "name", value: searchTerm }];
+      });
+    }, 300); // debounce
+    return () => clearTimeout(timeout);
+  }, [searchTerm]);
+
   return (
     <Tabs
       defaultValue={tabs[0]?.value}
-      className="flex w-full flex-col justify-start gap-6">
-      <div className="flex items-center justify-end px-4 lg:px-6">
+      className="flex w-full flex-col justify-start gap-6"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-4 px-4 lg:px-6">
+        <Input
+          placeholder="Search by name"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full max-w-sm"
+        />
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -223,32 +239,36 @@ export function DataTable<T extends object>({
           className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
         >
           {value === tabs[0].value ? (
-            <div className="overflow-hidden rounded-lg border">
-              <DndContext
-                collisionDetection={closestCenter}
-                modifiers={[restrictToVerticalAxis]}
-                onDragEnd={handleDragEnd}
-                sensors={sensors}
-              >
-                <Table>
-                  <TableHeader className="sticky top-0 z-10 bg-muted">
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                          <TableHead key={header.id} colSpan={header.colSpan}>
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext()
-                                )}
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHeader>
-                  <TableBody className="**:data-[slot=table-cell]:first:w-8">
-                    {table.getRowModel().rows?.length ? (
+            data.length === 0 ? (
+              <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-muted-foreground">
+                {noDataMessage}
+              </div>
+            ) : (
+              <div className="overflow-hidden rounded-lg border">
+                <DndContext
+                  collisionDetection={closestCenter}
+                  modifiers={[restrictToVerticalAxis]}
+                  onDragEnd={handleDragEnd}
+                  sensors={sensors}
+                >
+                  <Table>
+                    <TableHeader className="sticky top-0 z-10 bg-muted">
+                      {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id}>
+                          {headerGroup.headers.map((header) => (
+                            <TableHead key={header.id} colSpan={header.colSpan}>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHeader>
+                    <TableBody className="**:data-[slot=table-cell]:first:w-8">
                       <SortableContext
                         items={dataIds}
                         strategy={verticalListSortingStrategy}
@@ -261,20 +281,11 @@ export function DataTable<T extends object>({
                           />
                         ))}
                       </SortableContext>
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={columns.length}
-                          className="h-24 text-center"
-                        >
-                          {noDataMessage}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </DndContext>
-            </div>
+                    </TableBody>
+                  </Table>
+                </DndContext>
+              </div>
+            )
           ) : (
             content
           )}

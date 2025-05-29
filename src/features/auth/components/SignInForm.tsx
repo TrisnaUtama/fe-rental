@@ -56,6 +56,7 @@ export default function SignInForm() {
           name: res.data.name,
         };
         const token = { access_token: res.access_token };
+        console.log("signin : ", token);
         if (!token) {
           throw new Error("Access token is missing in the response");
         }

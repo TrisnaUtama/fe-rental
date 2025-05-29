@@ -10,7 +10,9 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/shared/components/ui/alert-dialog";
-import { closeDialog, confirm } from "@/store/slice/confiramtionDialog";
+import { closeDialog } from "@/store/slice/confiramtionDialog";
+
+import { callConfirmCallback } from "@/lib/confirmDialogCallback";
 
 export function GlobalConfirmDialog() {
   const dispatch = useDispatch();
@@ -19,14 +21,12 @@ export function GlobalConfirmDialog() {
   );
 
   const handleConfirm = () => {
-    dispatch(confirm());
+    callConfirmCallback(); 
+    dispatch(closeDialog());
   };
 
   return (
-    <AlertDialog
-      open={open}
-      onOpenChange={(open) => !open && dispatch(closeDialog())}
-    >
+    <AlertDialog open={open} onOpenChange={(open) => !open && dispatch(closeDialog())}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
@@ -44,3 +44,4 @@ export function GlobalConfirmDialog() {
     </AlertDialog>
   );
 }
+
