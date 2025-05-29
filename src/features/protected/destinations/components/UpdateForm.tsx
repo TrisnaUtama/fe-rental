@@ -44,8 +44,6 @@ export default function UpdateDestinationForm() {
 
   const {
     data,
-    isLoading: isFetchingDestination,
-    isError,
   } = useDestinationById(destination_id!, accessToken || "");
   const [combineImage, setCombineImage] = useState<
     { src: string; type: "url" | "file"; file?: File }[]
