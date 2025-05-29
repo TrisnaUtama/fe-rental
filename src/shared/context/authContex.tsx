@@ -28,12 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       sameSite: "Lax",
       path: "/",
     });
-    Cookies.set("access_token", accessToken, {
-      expires: 7,
-      secure: true,
-      sameSite: "Lax",
-      path: "/",
-    });
+    Cookies.get("access_token");
     setAccessToken(accessToken);
   }, []);
 
@@ -45,12 +40,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const updateAccessToken = useCallback((token: string) => {
-    Cookies.set("access_token", token, {
-      expires: 7,
-      secure: true,
-      sameSite: "Lax",
-      path: "/",
-    });
     setAccessToken(token);
   }, []);
 
@@ -60,7 +49,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const result = await refreshAccessToken();
         const rawUser = Cookies.get("user");
         const parsedUser = rawUser ? JSON.parse(rawUser) : null;
-
         if (parsedUser) {
           setUser(parsedUser);
           updateAccessToken(result.access_token);
@@ -68,7 +56,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           logout();
         }
       } catch (err) {
-        console.error("Failed to refresh session", err);
         logout();
       } finally {
         setIsLoading(false);
@@ -76,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     tryRefresh();
-  }, [logout, updateAccessToken]);
+  }, [updateAccessToken]);
 
   useEffect(() => {
     if (!accessToken) return;

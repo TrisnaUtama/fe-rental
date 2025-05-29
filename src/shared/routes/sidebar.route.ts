@@ -4,13 +4,15 @@ import {
   SettingsIcon,
   HelpCircleIcon,
   SearchIcon,
+  TreePalmIcon,
   type LucideIcon,
 } from "lucide-react";
 import type { Roles } from "@/shared/enum/enum";
 
 // Import your components
-import AdminDashboard from "@/features/dashboard/pages/Dashboard";
-import UserIndex from "@/features/user/pages/page";
+import AdminDashboard from "@/features/protected/dashboard/pages/Dashboard";
+import UserIndex from "@/features/protected/user/pages/page";
+import DestinationIndex from "@/features/protected/destinations/pages/page"
 // import DataLibraryPage from "@/pages/data-library";
 // import UserDataPage from "@/pages/data-user";
 // import SettingsPage from "@/pages/settings";
@@ -40,7 +42,15 @@ export const routeConfigs: RouteConfig[] = [
     url: "/data-user",
     icon: User2,
     component: UserIndex,
-    roles: ["SUPERADMIN","ADMIN_OPERATIONAL"],
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
+    group: "document",
+  },
+  {
+    title: "Destination",
+    url: "/data-destination",
+    icon: TreePalmIcon,
+    component: DestinationIndex,
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
     group: "document",
   },
   {
@@ -48,7 +58,7 @@ export const routeConfigs: RouteConfig[] = [
     url: "/settings",
     icon: SettingsIcon,
     component: AdminDashboard,
-    roles: ["SUPERADMIN","ADMIN_OPERATIONAL", "ADMIN_FINANCE", "DRIVER"],
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE", "DRIVER"],
     group: "secondary",
   },
   {

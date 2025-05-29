@@ -41,12 +41,12 @@ export async function SignOut(
   );
 }
 
-export async function refreshAccessToken(): Promise<{access_token: string}> {
+export async function refreshAccessToken(): Promise<{ access_token: string }> {
   return await httpRequest<{ access_token: string }>(
     `${import.meta.env.VITE_API_KEY}refresh`,
     {
       method: "POST",
-      credentials: "include", 
+      credentials: "include",
     }
   );
 }

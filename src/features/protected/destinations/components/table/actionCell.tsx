@@ -11,21 +11,24 @@ import {
 import { MoreVerticalIcon } from "lucide-react";
 import { openDialog } from "@/store/slice/confiramtionDialog";
 import { useAuthContext } from "@/shared/context/authContex";
-import { useDeleteUser } from "../../hooks/useUser";
+import { useDeleteDestination } from "../../hooks/useDestinations";
 import { toast } from "sonner";
-import type { IUser } from "../../types/user.type";
+import type { IDestination } from "../../types/destination.type";
+import { setConfirmCallback } from "@/lib/confirmDialogCallback";
 
-export function ActionsCell({ user }: { user: IUser }) {
+export function ActionsCell({ destination }: { destination: IDestination }) {
   const dispatch = useDispatch();
   const { accessToken } = useAuthContext();
   const navigate = useNavigate();
-  const { mutate } = useDeleteUser(accessToken || "");
+  const { mutate } = useDeleteDestination(accessToken || "");
 
   const handleDeleteConfirm = () => {
-    mutate(user.id || "", {
+    mutate(destination.id || "", {
       onSuccess: () => {
-        toast.success("User deleted successfully!");
-        window.location.reload();
+        toast.success("Destination deleted successfully!");
+        setTimeout(() => {
+          navigate(0)
+        }, 2000)
       },
       onError: (err: any) => {
         if (err?.errors && typeof err.errors === "object") {
@@ -38,21 +41,21 @@ export function ActionsCell({ user }: { user: IUser }) {
   };
 
   const handleDeleteClick = () => {
+    setConfirmCallback(handleDeleteConfirm);
     dispatch(
       openDialog({
         title: "Confirm Delete",
-        description: "Are you sure you want to delete this user?",
-        onConfirm: handleDeleteConfirm,
+        description: "Are you sure you want to delete this destination?",
       })
     );
   };
 
   const handleEditClick = () => {
-    if (!user.id) {
+    if (!destination.id) {
       toast.error("User ID is missing");
       return;
     }
-    navigate(`/data-user/update/${user.id}`);
+    navigate(`/data-destination/update/${destination.id}`);
   };
 
   return (

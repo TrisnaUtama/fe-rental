@@ -20,6 +20,7 @@ export async function CreateUser(
 export async function GetAllUsers(
   token: string
 ): Promise<IResponseGlobal<IUser[]>> {
+  console.log(token);
   return await httpRequest<IResponseGlobal<IUser[]>>(
     `${import.meta.env.VITE_API_KEY}users/`,
     {

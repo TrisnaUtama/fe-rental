@@ -1,5 +1,5 @@
 import Index from "../components";
 
-export default function SignUpPage() {
+export default function DestinationIndex() {
   return <Index />;
 }
