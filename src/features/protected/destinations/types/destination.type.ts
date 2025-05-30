@@ -21,4 +21,3 @@ export interface ICreateDestination {
   status?: boolean;
   deleted_at?: Date | null;
 }
-

@@ -1,21 +1,21 @@
 import { Breadcrumbs } from "@/shared/components/Breadcrumbs";
-import {  TreeDeciduous, Pencil } from "lucide-react";
-import UpdateDestinationForm from "../components/UpdateForm";
+import {  CarFrontIcon, Pencil } from "lucide-react";
+import UpdateVehicleForm from "../components/UpdateForm";
 
 export default function UpdatePage() {
   return (
     <div className="space-y-4 mx-40">
       <Breadcrumbs
         items={[
-          { title: "Destination", href: "/data-destination", icon: <TreeDeciduous className="h-4 w-4" /> },
+          { title: "Vehicle", href: "/data-vehicle", icon: <CarFrontIcon className="h-4 w-4" /> },
           {
             title: "Update",
-            href: "/destination",
+            href: "/vehicle",
             icon: <Pencil className="h-4 w-4" />,
           },
         ]}
       />
-      <UpdateDestinationForm />
+      <UpdateVehicleForm />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { Breadcrumbs } from "@/shared/components/Breadcrumbs";
-import CreateDestinationForm from "../components/CreateForm";
-import { TreePalm, Pencil } from "lucide-react";
+import CreateVehicleForm from "../components/CreateForm";
+import { CarFrontIcon, Pencil } from "lucide-react";
 
 export default function CreatePage() {
   return (
@@ -8,18 +8,18 @@ export default function CreatePage() {
       <Breadcrumbs
         items={[
           {
-            title: "Destination",
-            href: "/data-Vehicle",
-            icon: <TreePalm className="h-4 w-4" />,
+            title: "Vehicle",
+            href: "/data-vehicle",
+            icon: <CarFrontIcon className="h-4 w-4" />,
           },
           {
             title: "Create",
-            href: "/destination",
+            href: "/vehicle",
             icon: <Pencil className="h-4 w-4" />,
           },
         ]}
       />
-      <CreateDestinationForm />
+      <CreateVehicleForm />
     </div>
   );
 }
