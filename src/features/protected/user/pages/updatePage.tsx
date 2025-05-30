@@ -4,7 +4,7 @@ import UpdateUserForm from "../components/UpdateForm";
 
 export default function UpdatePage() {
   return (
-    <div className="space-y-4 mx-24">
+    <div className="space-y-4 mx-40">
       <Breadcrumbs
         items={[
           { title: "User", href: "/data-user", icon: <User className="h-4 w-4" /> },

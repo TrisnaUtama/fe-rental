@@ -43,12 +43,3 @@ export const UpdateDestinationSchema = z.object({
     open_hour: `${data.start_open}-${data.end_open}`, 
   }));
 
-export const schemaTable = z.object({
-  id: z.string().uuid(), 
-  name: z.string(),
-  image_url: z.string().url(),
-  open_hours: z.string(), 
-  address: z.string(), 
-  status: z.enum(["active", "inactive", "closed"]), 
-  category: z.string(), 
-});

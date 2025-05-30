@@ -30,14 +30,14 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useZodForm } from "@/shared/hooks/useZodForm";
 import { DestinationSchema } from "../utils/zod.schema";
+import { Separator } from "@/shared/components/ui/separator";
+import { Badge } from "@/shared/components/ui/badge";
 
 export default function CreateDestinationForm() {
-  
   const navigate = useNavigate();
   const { accessToken } = useAuthContext();
-  const { mutateAsync: createDestinationAsync, isPending: isCreating } = useCreateDestination(
-    accessToken || ""
-  );
+  const { mutateAsync: createDestinationAsync, isPending: isCreating } =
+    useCreateDestination(accessToken || "");
 
   const { mutateAsync: uploadImageAsync, isPending: isUploading } =
     useUploadImage(accessToken || "");
@@ -59,57 +59,54 @@ export default function CreateDestinationForm() {
       facilities: [""],
       status: true,
       address: "",
-      category:""
+      category: "",
     },
     DestinationSchema
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!validateForm()) return;
+    e.preventDefault();
+    if (!validateForm()) return;
 
-  console.log("Starting image upload");
-
-  try {
-    const uploadedImageResponses = await Promise.all(
-      form.image_urls.map((file) => uploadImageAsync(file as File))
-    );
-    const imageUrls = uploadedImageResponses.map((res) => res.data.url);
-    const { start_open, end_open, ...rest } = form;
-    const submissionPayload = {
-      ...rest,
-      open_hour: `${start_open}-${end_open}`,
-      image_urls: imageUrls,
-    };
-    const data = await createDestinationAsync(submissionPayload);
-    if(data.success){
-      toast.success("Success",{
-        description: `Successfuly created ${data.data.name} Destination`
-      } );
-      resetForm();
-      navigate("/data-destination");
-      window.location.reload()
-    }else{
-      toast.error("Failed", {
-        description: `Failed created new destination`
-      });
+    try {
+      const uploadedImageResponses = await Promise.all(
+        form.image_urls.map((file) => uploadImageAsync(file as File))
+      );
+      const imageUrls = uploadedImageResponses.map((res) => res.data.url);
+      const { start_open, end_open, ...rest } = form;
+      const submissionPayload = {
+        ...rest,
+        open_hour: `${start_open}-${end_open}`,
+        image_urls: imageUrls,
+      };
+      const data = await createDestinationAsync(submissionPayload);
+      if (data.success) {
+        toast.success("Success", {
+          description: `Successfuly created ${data.data.name} Destination`,
+        });
+        resetForm();
+        navigate("/data-destination");
+        navigate(0)
+      } else {
+        toast.error("Failed", {
+          description: `Failed created new destination`,
+        });
+      }
+    } catch (err: any) {
+      if (err?.errors && typeof err.errors === "object") {
+        setFieldErrors((prev: any) => ({
+          ...prev,
+          ...err.errors,
+        }));
+      } else {
+        setFieldErrors((prev) => ({
+          ...prev,
+          general: err.message || "Unknown error occurred",
+        }));
+        toast.error("Failed to create Destination.");
+      }
     }
-  } catch (err: any) {
-    if (err?.errors && typeof err.errors === "object") {
-      setFieldErrors((prev: any) => ({
-        ...prev,
-        ...err.errors,
-      }));
-    } else {
-      setFieldErrors((prev) => ({
-        ...prev,
-        general: err.message || "Unknown error occurred",
-      }));
-      toast.error("Failed to create Destination.");
-    }
-  }
-};
-
+  };
 
   const handleArrayChange = (
     field: "facilities",
@@ -181,119 +178,141 @@ export default function CreateDestinationForm() {
       image_urls: [],
       facilities: [""],
       status: true,
-      category:""
+      category: "",
     });
     setFieldErrors({});
   };
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <Card className="border border-gray-200 shadow-sm">
-        <CardHeader className="bg-white border-b">
-          <CardTitle className="text-xl font-semibold flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
+    <div className="mx-auto max-w-4xl space-y-6">
+      <Card className="border shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold flex items-center gap-3">
+            <div className="p-2 bg-black text-white rounded-lg">
+              <MapPin className="h-6 w-6" />
+            </div>
             Create New Destination
           </CardTitle>
-          <CardDescription>
-            Fill in the details below to create a new destination
+          <CardDescription className="text-base">
+            Add a new destination to your fleet with detailed specifications and
+            images
           </CardDescription>
         </CardHeader>
-        <CardContent className="bg-white p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Destination Name */}
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <MapPin className="h-4 w-4" />
-                  <Label className="text-sm font-medium">
-                    Destination Name
-                  </Label>
+      </Card>
+      <Card className="border border-gray-200 shadow-lg">
+        <CardContent className="bg-white p-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Main Form Card */}
+            <div>
+              <div className="flex items-center gap-2 mb-6">
+                <div className="p-1 bg-blue-100 rounded">
+                  <MapPin className="h-5 w-5 text-blue-600" />
                 </div>
-                <Input
-                  name="name"
-                  value={form.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                  placeholder="Enter destination name"
-                />
-                {fieldErrors.name && (
-                  <p className="text-red-600 mt-1 text-sm">
-                    {fieldErrors.name}
-                  </p>
-                )}
+                <h3 className="text-lg font-semibold">Basic Information</h3>
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 space-y-5">
+                {/* Destination Name */}
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <MapPin className="h-4 w-4" />
+                    <Label className="text-sm font-medium">
+                      Destination Name
+                    </Label>
+                  </div>
+                  <Input
+                    name="name"
+                    value={form.name}
+                    onChange={(e) => handleChange("name", e.target.value)}
+                    placeholder="Enter destination name"
+                  />
+                  {fieldErrors.name && (
+                    <p className="text-red-600 mt-1 text-sm">
+                      {fieldErrors.name}
+                    </p>
+                  )}
+                </div>
 
-              {/* Address */}
-              <div>
-                <Label className="flex items-center gap-2 mb-1 mt-1">
-                  <Navigation className="h-4 w-4" />
-                  Address
-                </Label>
-                <Input
-                  value={form.address}
-                  onChange={(e) => handleChange("address", e.target.value)}
-                  placeholder="e.g. Pantai Kuta"
-                />
-                {fieldErrors.address && (
-                  <p className="text-red-600 mt-1 text-sm">
-                    {fieldErrors.address}
-                  </p>
-                )}
+                {/* Address */}
+                <div>
+                  <Label className="flex items-center gap-2 mb-1 mt-1">
+                    <Navigation className="h-4 w-4" />
+                    Address
+                  </Label>
+                  <Input
+                    value={form.address}
+                    onChange={(e) => handleChange("address", e.target.value)}
+                    placeholder="e.g. Pantai Kuta"
+                  />
+                  {fieldErrors.address && (
+                    <p className="text-red-600 mt-1 text-sm">
+                      {fieldErrors.address}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {/* Opening Hours */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <Label className="flex items-center gap-2 mb-1">
+                    <Clock className="w-4 h-4" /> Start Open
+                  </Label>
+                  <Input
+                    value={form.start_open}
+                    type="time"
+                    onChange={(e) => handleChange("start_open", e.target.value)}
+                    placeholder="e.g. 08:00"
+                  />
+                  {fieldErrors.start_open && (
+                    <p className="text-red-600 mt-1 text-sm">
+                      {fieldErrors.start_open}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <Label className="flex items-center gap-2 mb-1">
+                    <ClockAlertIcon className="h-4 w-4" />
+                    Closed
+                  </Label>
+                  <Input
+                    value={form.end_open}
+                    type="time"
+                    onChange={(e) => handleChange("end_open", e.target.value)}
+                    placeholder="e.g. 17:00"
+                  />
+                  {fieldErrors.end_open && (
+                    <p className="text-red-600 mt-1 text-sm">
+                      {fieldErrors.end_open}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <Label className="flex items-center gap-2 mb-1">
+                    <Tag className="h-4 w-4" />
+                    Category
+                  </Label>
+                  <Input
+                    value={form.category}
+                    onChange={(e) => handleChange("category", e.target.value)}
+                    placeholder="e.g. beach, mountain, shore"
+                  />
+                  {fieldErrors.category && (
+                    <p className="text-red-600 mt-1 text-sm">
+                      {fieldErrors.category}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-            {/* Opening Hours */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <Label className="flex items-center gap-2 mb-1">
-                  <Clock className="w-4 h-4" /> Start Open
-                </Label>
-                <Input
-                  value={form.start_open}
-                  type="time"
-                  onChange={(e) => handleChange("start_open", e.target.value)}
-                  placeholder="e.g. 08:00"
-                />
-                {fieldErrors.start_open && (
-                  <p className="text-red-600 mt-1 text-sm">
-                    {fieldErrors.start_open}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label className="flex items-center gap-2 mb-1">
-                  <ClockAlertIcon className="h-4 w-4" />
-                  Closed
-                </Label>
-                <Input
-                  value={form.end_open}
-                  type="time"
-                  onChange={(e) => handleChange("end_open", e.target.value)}
-                  placeholder="e.g. 17:00"
-                />
-                {fieldErrors.end_open && (
-                  <p className="text-red-600 mt-1 text-sm">
-                    {fieldErrors.end_open}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label className="flex items-center gap-2 mb-1">
-                  <Tag className="h-4 w-4" />
-                  Category
-                </Label>
-                <Input
-                  value={form.category}
-                  onChange={(e) => handleChange("category", e.target.value)}
-                  placeholder="e.g. beach, mountain, shore"
-                />
-                {fieldErrors.category && (
-                  <p className="text-red-600 mt-1 text-sm">
-                    {fieldErrors.category}
-                  </p>
-                )}
-              </div>
-            </div>
+            <Separator />
+
             {/* Description */}
             <div>
+              <div className="flex items-center gap-2 mb-6">
+                <div className="p-1 bg-purple-100 rounded">
+                  <FileText className="h-5 w-5 text-purple-600" />
+                </div>
+                <h3 className="text-lg font-semibold">Description</h3>
+              </div>
               <div className="flex items-center gap-2 mb-1">
                 <FileText className="h-4 w-4" />
                 <Label className="text-sm font-medium">Description</Label>
@@ -310,13 +329,24 @@ export default function CreateDestinationForm() {
                   {fieldErrors.description}
                 </p>
               )}
+              <p className="text-sm text-gray-500">
+                {form.description.length}/500 characters
+              </p>
             </div>
+
+            <Separator />
 
             {/* Image Upload */}
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <ImageIcon className="h-4 w-4" />
-                <Label className="text-sm font-medium">Images</Label>
+              <div className="flex items-center gap-2 mb-6">
+                <div className="p-1 bg-red-100 rounded">
+                  <ImageIcon className="h-5 w-5 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold">Destination Images</h3>
+                <Badge variant="outline" className="ml-auto">
+                  {form.image_urls.length} image
+                  {form.image_urls.length !== 1 ? "s" : ""} uploaded
+                </Badge>
               </div>
 
               {/* Upload Area */}
@@ -392,9 +422,18 @@ export default function CreateDestinationForm() {
                 </p>
               )}
             </div>
+            <Separator />
 
             {/* Facilities */}
             <div>
+              <div className="flex items-center gap-2 mb-6">
+                <div className="p-1 bg-green-100 rounded">
+                  <Settings className="h-5 w-5 text-green-600" />
+                </div>
+                <h3 className="text-lg font-semibold">
+                  Technical Specifications
+                </h3>
+              </div>
               <div className="flex items-center gap-2 mb-2">
                 <Settings className="h-4 w-4" />
                 <Label className="text-sm font-medium">Facilities</Label>

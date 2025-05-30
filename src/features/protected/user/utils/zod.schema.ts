@@ -28,13 +28,3 @@ export const UpdateUserSchema = z.object({
   year_of_experiences: z.number().nullable(),
 });
 
-export const schemaTable = z.object({
-  user_id: z.string(),
-  name: z.string(),
-  email: z.string().email(),
-  phone_number: z.string(),
-  role: z.string(),
-  is_verified: z.boolean(),
-  status: z.string(),
-  year_of_experiences: z.number(),
-});
