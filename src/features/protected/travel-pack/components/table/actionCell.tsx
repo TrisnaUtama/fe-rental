@@ -11,24 +11,24 @@ import {
 import { MoreVerticalIcon } from "lucide-react";
 import { openDialog } from "@/store/slice/confiramtionDialog";
 import { useAuthContext } from "@/shared/context/authContex";
-import { useDeleteDestination } from "../../hooks/useDestinations";
+import { useDeleteTravelPack } from "../../hooks/useTravelPack";
 import { toast } from "sonner";
-import type { IDestination } from "../../types/destination.type";
+import type { ITravelPack } from "../../types/travel-pack";
 import { setConfirmCallback } from "@/lib/confirmDialogCallback";
 
-export function ActionsCell({ destination }: { destination: IDestination }) {
+export function ActionsCell({ travelPack }: { travelPack: ITravelPack }) {
   const dispatch = useDispatch();
   const { accessToken } = useAuthContext();
   const navigate = useNavigate();
-  const { mutate } = useDeleteDestination(accessToken || "");
+  const { mutate } = useDeleteTravelPack(accessToken || "");
 
   const handleDeleteConfirm = () => {
-    mutate(destination.id || "", {
+    mutate(travelPack.id || "", {
       onSuccess: () => {
         toast.success("Destination deleted successfully!");
         setTimeout(() => {
-          navigate(0)
-        }, 2000)
+          navigate(0);
+        }, 2000);
       },
       onError: (err: any) => {
         if (err?.errors && typeof err.errors === "object") {
@@ -45,17 +45,17 @@ export function ActionsCell({ destination }: { destination: IDestination }) {
     dispatch(
       openDialog({
         title: "Confirm Delete",
-        description: "Are you sure you want to delete this destination?",
+        description: "Are you sure you want to delete this travel pack?",
       })
     );
   };
 
   const handleEditClick = () => {
-    if (!destination.id) {
+    if (!travelPack.id) {
       toast.error("User ID is missing");
       return;
     }
-    navigate(`/data-destination/update/${destination.id}`);
+    navigate(`/data-travel-pack/update/${travelPack.id}`);
   };
 
   return (
@@ -72,9 +72,9 @@ export function ActionsCell({ destination }: { destination: IDestination }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem disabled={!destination.status} onClick={handleEditClick}>Edit</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleEditClick}>Edit</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleDeleteClick}>
+          <DropdownMenuItem disabled={!travelPack.status} onClick={handleDeleteClick}>
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

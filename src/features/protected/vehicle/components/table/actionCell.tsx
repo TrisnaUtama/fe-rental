@@ -72,7 +72,12 @@ export function ActionsCell({ vehicle }: { vehicle: IVehicle }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem onClick={handleEditClick}>Edit</DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={!vehicle.status}
+            onClick={handleEditClick}
+          >
+            Edit
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleDeleteClick}>
             Delete

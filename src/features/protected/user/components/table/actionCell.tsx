@@ -72,7 +72,7 @@ const handleDeleteClick = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem onClick={handleEditClick}>Edit</DropdownMenuItem>
+          <DropdownMenuItem disabled={!user.status} onClick={handleEditClick}>Edit</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem disabled={!user.status} onClick={handleDeleteClick}>
             Delete

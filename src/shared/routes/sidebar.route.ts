@@ -7,6 +7,7 @@ import {
   TreePalmIcon,
   CarFrontIcon,
   type LucideIcon,
+  PlaneIcon,
 } from "lucide-react";
 import type { Roles } from "@/shared/enum/enum";
 
@@ -15,6 +16,7 @@ import AdminDashboard from "@/features/protected/dashboard/pages/Dashboard";
 import UserIndex from "@/features/protected/user/pages/page";
 import DestinationIndex from "@/features/protected/destinations/pages/page"
 import VehicleIndex from "@/features/protected/vehicle/pages/page"
+import TravelPackIndex from "@/features/protected/travel-pack/pages/page";
 // import DataLibraryPage from "@/pages/data-library";
 // import UserDataPage from "@/pages/data-user";
 // import SettingsPage from "@/pages/settings";
@@ -60,6 +62,14 @@ export const routeConfigs: RouteConfig[] = [
     url: "/data-vehicle",
     icon: CarFrontIcon,
     component: VehicleIndex,
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
+    group: "document",
+  },
+  {
+    title: "Travel Pack",
+    url: "/data-travel-pack",
+    icon: PlaneIcon,
+    component: TravelPackIndex,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
     group: "document",
   },

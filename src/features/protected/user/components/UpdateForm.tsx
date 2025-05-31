@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -10,21 +10,29 @@ import {
   CardDescription,
   CardContent,
 } from "@/shared/components/ui/card";
-import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
-import { User, Mail, Phone, Shield, Calendar, Eye, EyeOff } from "lucide-react";
+import {
+  User,
+  Mail,
+  Phone,
+  Shield,
+  Calendar,
+  ToggleRight,
+  Lock,
+} from "lucide-react";
 import { useZodForm } from "@/shared/hooks/useZodForm";
 import { UpdateUserSchema } from "../utils/zod.schema";
 import { useAuthContext } from "@/shared/context/authContex";
 import { useUserById, useUpdateUser } from "../hooks/useUser";
 import LoadingSpinner from "@/features/redirect/pages/Loading";
 import { toast } from "sonner";
+import { FormInput } from "@/shared/components/ui/form-field";
+import { FormSelect } from "@/shared/components/ui/form-select";
+import { FormPasswordInput } from "@/shared/components/ui/form-password";
 
 export default function UpdateUserForm() {
   const { id: userId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { accessToken } = useAuthContext();
-  const [showPassword, setShowPassword] = useState(false);
 
   const {
     data,
@@ -121,6 +129,9 @@ export default function UpdateUserForm() {
   };
 
   if (isFetchingUser) return <LoadingSpinner />;
+  if (isPending) {
+    <LoadingSpinner />;
+  }
   if (isError) return <p className="text-red-500">Failed to load user data.</p>;
 
   return (
@@ -140,172 +151,96 @@ export default function UpdateUserForm() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Full Name */}
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <User className="h-4 w-4" />
-                    <Label className="text-sm font-medium">Full Name</Label>
-                  </div>
-                  <Input
-                    name="name"
-                    value={form.name}
-                    onChange={(e) => handleChange("name", e.target.value)}
-                    placeholder="Enter full name"
-                  />
-                  {fieldErrors.name && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.name}
-                    </p>
-                  )}
-                </div>
+                <FormInput
+                  name="name"
+                  label="Full Name"
+                  icon={User}
+                  value={form.name || ""}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  placeholder="Enter full name"
+                  error={fieldErrors.name}
+                />
 
                 {/* Email */}
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Mail className="h-4 w-4" />
-                    <Label className="text-sm font-medium">Email Address</Label>
-                  </div>
-                  <Input
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
-                    placeholder="user@example.com"
-                  />
-                  {fieldErrors.email && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.email}
-                    </p>
-                  )}
-                </div>
+                <FormInput
+                  name="email"
+                  label="Email"
+                  icon={Mail}
+                  value={form.email || ""}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  placeholder="user@example.com"
+                  error={fieldErrors.email}
+                />
 
                 {/* Years of Experience */}
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Calendar className="h-4 w-4" />
-                    <Label className="text-sm font-medium">
-                      Years of Experience
-                    </Label>
-                  </div>
-                  <Input
-                    name="yearsOfExperience"
-                    type="number"
-                    min="0"
-                    max="50"
-                    value={form.year_of_experiences ?? 0}
-                    onChange={(e) =>
-                      handleChange(
-                        "year_of_experiences",
-                        Number(e.target.value)
-                      )
-                    }
-                    placeholder="0"
-                  />
-                </div>
+                <FormInput
+                  name="yearsOfExperience"
+                  type="number"
+                  label="Years of Experience"
+                  icon={Calendar}
+                  value={form.year_of_experiences || ""}
+                  onChange={(e) =>
+                    handleChange("year_of_experiences", e.target.value)
+                  }
+                  placeholder="0"
+                  error={fieldErrors.year_of_experiences}
+                />
 
                 {/* Phone Number */}
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Phone className="h-4 w-4" />
-                    <Label className="text-sm font-medium">Phone Number</Label>
-                  </div>
-                  <Input
-                    name="phone_number"
-                    type="tel"
-                    value={form.phone_number}
-                    onChange={(e) =>
-                      handleChange("phone_number", e.target.value)
-                    }
-                    placeholder="+1 (555) 123-4567"
-                  />
-                  {fieldErrors.phone_number && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.phone_number}
-                    </p>
-                  )}
-                </div>
+                <FormInput
+                  name="phone_number"
+                  type="tel"
+                  label="Phone Number"
+                  icon={Phone}
+                  value={form.phone_number || ""}
+                  onChange={(e) => handleChange("phone_number", e.target.value)}
+                  placeholder="+1 (555) 123-4567"
+                  error={fieldErrors.phone_number}
+                />
 
                 {/* Status */}
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Label className="text-sm font-medium">Status</Label>
-                  </div>
-                  <select
-                    name="status"
-                    value={form.status}
-                    onChange={(e) => handleChange("status", e.target.value)}
-                    className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-900"
-                  >
-                    <option value="">Select status</option>
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
-                  </select>
-                  {fieldErrors.status && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.status}
-                    </p>
-                  )}
-                </div>
+                <FormSelect
+                  name="status"
+                  label="Status"
+                  icon={ToggleRight}
+                  value={form.status || ""}
+                  onChange={(e) => handleChange("status", e.target.value)}
+                  error={fieldErrors.status}
+                  options={[
+                    { label: "Active", value: "true" },
+                    { label: "Inactive", value: "false" },
+                  ]}
+                />
 
                 {/* Role */}
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Shield className="h-4 w-4" />
-                    <Label className="text-sm font-medium">Role</Label>
-                  </div>
-                  <select
-                    name="role"
-                    value={form.role}
-                    onChange={(e) => handleChange("role", e.target.value)}
-                    className="mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-900"
-                  >
-                    <option value="">Select user role</option>
-                    <option value="ADMIN_OPERATIONAL">Admin Operasional</option>
-                    <option value="ADMIN_FINANCE">Admin Finance</option>
-                    <option value="DRIVER">Driver</option>
-                    <option value="CUSTOMER">Customer</option>
-                  </select>
-                  {fieldErrors.role && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.role}
-                    </p>
-                  )}
-                </div>
+                <FormSelect
+                  name="role"
+                  label="Role"
+                  icon={Shield}
+                  value={form.role}
+                  onChange={(e) => handleChange("role", e.target.value)}
+                  error={fieldErrors.status}
+                  options={[
+                    { label: "Admin Operasional", value: "ADMIN_OPERATIONAL" },
+                    { label: "Admin Finance", value: "ADMIN_FINANCE" },
+                    { label: "Driver", value: "DRIVER" },
+                    { label: "Customer", value: "CUSTOMER" },
+                  ]}
+                />
 
                 {/* Password */}
                 <div className="md:col-span-2">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Label className="text-sm font-medium">Password</Label>
-                  </div>
-                  <div className="relative">
-                    <Input
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      value={form.password}
-                      onChange={(e) => handleChange("password", e.target.value)}
-                      placeholder="Enter secure password"
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                      aria-label="Toggle password visibility"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
-                  {fieldErrors.password && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.password}
-                    </p>
-                  )}
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Password must be at least 6 characters long
-                  </p>
+                  <FormPasswordInput
+                    name="password"
+                    label="Password"
+                    icon={Lock}
+                    value={form.password}
+                    onChange={(e: { target: { value: string | number } }) =>
+                      handleChange("password", e.target.value)
+                    }
+                    error={fieldErrors.password}
+                    helperText="Password must be at least 6 characters long"
+                  />
                 </div>
               </div>
 
@@ -315,7 +250,17 @@ export default function UpdateUserForm() {
                   className="flex-1 bg-black text-white hover:bg-gray-800"
                   disabled={isPending}
                 >
-                  {isPending ? <LoadingSpinner /> : "Update User"}
+                  {isPending ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Saving...
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <User className="h-5 w-5" />
+                      Create User
+                    </div>
+                  )}
                 </Button>
                 <Button
                   type="button"
