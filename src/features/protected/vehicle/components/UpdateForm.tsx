@@ -42,6 +42,7 @@ import { useAuthContext } from "@/shared/context/authContex";
 import { useUpdateVehicle, useVehicleById } from "../hooks/useVehicle";
 import { toast } from "sonner";
 import { useDeleteImage, useUploadImage } from "@/shared/hooks/useStorage";
+import LoadingSpinner from "@/features/redirect/pages/Loading";
 
 const VehicleTypes = {
   CITY_CAR: "CITY_CAR",
@@ -346,6 +347,10 @@ export default function UpdateVehicleForm() {
     handleFileUpload(files);
   };
 
+  if (isCreating || isUploading) {
+    <LoadingSpinner />;
+  }
+
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       {/* Header Card */}
@@ -522,7 +527,6 @@ export default function UpdateVehicleForm() {
                 </div>
               </div>
             </div>
-
             <Separator />
 
             {/* Technical Specifications Section */}
@@ -644,7 +648,6 @@ export default function UpdateVehicleForm() {
                 </div>
               </div>
             </div>
-
             <Separator />
 
             {/* Pricing Section */}
@@ -717,8 +720,8 @@ export default function UpdateVehicleForm() {
                 </p>
               </div>
             </div>
-
             <Separator />
+
             {/* Image Upload Section */}
             <div>
               <div className="flex items-center gap-2 mb-6">
@@ -727,8 +730,8 @@ export default function UpdateVehicleForm() {
                 </div>
                 <h3 className="text-lg font-semibold">Vehicle Images</h3>
                 <Badge variant="outline" className="ml-auto">
-                  {form.image_url.length} image
-                  {form.image_url.length !== 1 ? "s" : ""} uploaded
+                  {combineImage.length} image
+                  {combineImage.length !== 1 ? "s" : ""} uploaded
                 </Badge>
               </div>
 
@@ -784,7 +787,7 @@ export default function UpdateVehicleForm() {
               )}
 
               {/* Image Previews */}
-              {form.image_url.length > 0 && (
+              {combineImage.length > 0 && (
                 <div className="mt-8">
                   <h4 className="text-md font-medium mb-4">Image Preview</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -829,7 +832,7 @@ export default function UpdateVehicleForm() {
                 ) : (
                   <div className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5" />
-                    Create Vehicle
+                    Update Vehicle
                   </div>
                 )}
               </Button>

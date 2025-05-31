@@ -8,7 +8,6 @@ import {
 } from "@/shared/components/ui/card";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import { Textarea } from "@/shared/components/ui/textarea";
 import {
   MapPin,
   Clock,
@@ -32,6 +31,9 @@ import { useZodForm } from "@/shared/hooks/useZodForm";
 import { DestinationSchema } from "../utils/zod.schema";
 import { Separator } from "@/shared/components/ui/separator";
 import { Badge } from "@/shared/components/ui/badge";
+import { FormInput } from "@/shared/components/ui/form-field";
+import { FormTextarea } from "@/shared/components/ui/form-text-area";
+import LoadingSpinner from "@/features/redirect/pages/Loading";
 
 export default function CreateDestinationForm() {
   const navigate = useNavigate();
@@ -86,7 +88,7 @@ export default function CreateDestinationForm() {
         });
         resetForm();
         navigate("/data-destination");
-        navigate(0)
+        navigate(0);
       } else {
         toast.error("Failed", {
           description: `Failed created new destination`,
@@ -183,6 +185,10 @@ export default function CreateDestinationForm() {
     setFieldErrors({});
   };
 
+  if (isCreating || isUploading) {
+    <LoadingSpinner />;
+  }
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <Card className="border shadow-lg">
@@ -212,128 +218,76 @@ export default function CreateDestinationForm() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 space-y-5">
                 {/* Destination Name */}
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <MapPin className="h-4 w-4" />
-                    <Label className="text-sm font-medium">
-                      Destination Name
-                    </Label>
-                  </div>
-                  <Input
-                    name="name"
-                    value={form.name}
-                    onChange={(e) => handleChange("name", e.target.value)}
-                    placeholder="Enter destination name"
-                  />
-                  {fieldErrors.name && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.name}
-                    </p>
-                  )}
-                </div>
+                <FormInput
+                  name="name"
+                  label="Destination Name"
+                  icon={MapPin}
+                  value={form.name}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  placeholder="Enter destination name"
+                  error={fieldErrors.name}
+                />
 
                 {/* Address */}
-                <div>
-                  <Label className="flex items-center gap-2 mb-1 mt-1">
-                    <Navigation className="h-4 w-4" />
-                    Address
-                  </Label>
-                  <Input
-                    value={form.address}
-                    onChange={(e) => handleChange("address", e.target.value)}
-                    placeholder="e.g. Pantai Kuta"
-                  />
-                  {fieldErrors.address && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.address}
-                    </p>
-                  )}
-                </div>
+                <FormInput
+                  name="address"
+                  label="Address"
+                  icon={Navigation}
+                  value={form.address}
+                  onChange={(e) => handleChange("address", e.target.value)}
+                  placeholder="e.g. Pantai Kuta"
+                  error={fieldErrors.address}
+                />
               </div>
               {/* Opening Hours */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <Label className="flex items-center gap-2 mb-1">
-                    <Clock className="w-4 h-4" /> Start Open
-                  </Label>
-                  <Input
-                    value={form.start_open}
-                    type="time"
-                    onChange={(e) => handleChange("start_open", e.target.value)}
-                    placeholder="e.g. 08:00"
-                  />
-                  {fieldErrors.start_open && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.start_open}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label className="flex items-center gap-2 mb-1">
-                    <ClockAlertIcon className="h-4 w-4" />
-                    Closed
-                  </Label>
-                  <Input
-                    value={form.end_open}
-                    type="time"
-                    onChange={(e) => handleChange("end_open", e.target.value)}
-                    placeholder="e.g. 17:00"
-                  />
-                  {fieldErrors.end_open && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.end_open}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label className="flex items-center gap-2 mb-1">
-                    <Tag className="h-4 w-4" />
-                    Category
-                  </Label>
-                  <Input
-                    value={form.category}
-                    onChange={(e) => handleChange("category", e.target.value)}
-                    placeholder="e.g. beach, mountain, shore"
-                  />
-                  {fieldErrors.category && (
-                    <p className="text-red-600 mt-1 text-sm">
-                      {fieldErrors.category}
-                    </p>
-                  )}
-                </div>
+                <FormInput
+                  name="start_open"
+                  label="Start Open"
+                  icon={Clock}
+                  type="time"
+                  value={form.start_open}
+                  onChange={(e) => handleChange("start_open", e.target.value)}
+                  placeholder="e.g. 08:00"
+                  error={fieldErrors.start_open}
+                />
+
+                <FormInput
+                  name="end_open"
+                  label="Closed"
+                  icon={ClockAlertIcon}
+                  type="time"
+                  value={form.end_open}
+                  onChange={(e) => handleChange("end_open", e.target.value)}
+                  placeholder="e.g. 17:00"
+                  error={fieldErrors.end_open}
+                />
+
+                <FormInput
+                  name="category"
+                  label="Category"
+                  icon={Tag}
+                  value={form.category}
+                  onChange={(e) => handleChange("category", e.target.value)}
+                  placeholder="e.g. beach, mountain, shore"
+                  error={fieldErrors.category}
+                />
               </div>
             </div>
             <Separator />
 
             {/* Description */}
-            <div>
-              <div className="flex items-center gap-2 mb-6">
-                <div className="p-1 bg-purple-100 rounded">
-                  <FileText className="h-5 w-5 text-purple-600" />
-                </div>
-                <h3 className="text-lg font-semibold">Description</h3>
-              </div>
-              <div className="flex items-center gap-2 mb-1">
-                <FileText className="h-4 w-4" />
-                <Label className="text-sm font-medium">Description</Label>
-              </div>
-              <Textarea
-                name="description"
-                value={form.description}
-                onChange={(e) => handleChange("description", e.target.value)}
-                placeholder="Enter destination description"
-                rows={4}
-              />
-              {fieldErrors.description && (
-                <p className="text-red-600 mt-1 text-sm">
-                  {fieldErrors.description}
-                </p>
-              )}
-              <p className="text-sm text-gray-500">
-                {form.description.length}/500 characters
-              </p>
-            </div>
-
+            <FormTextarea
+              name="description"
+              label="Description"
+              icon={FileText}
+              value={form.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+              placeholder="Enter destination description"
+              rows={4}
+              maxLength={500}
+              error={fieldErrors.description}
+            />
             <Separator />
 
             {/* Image Upload */}

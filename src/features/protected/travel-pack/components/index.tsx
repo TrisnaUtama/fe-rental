@@ -1,26 +1,25 @@
 import { useAuthContext } from "@/shared/context/authContex";
-import { useAllDestinations } from "../hooks/useDestinations";
+import { useAllTravelPack } from "../hooks/useTravelPack";
 import { DataTable } from "@/shared/components/table/table";
-import { destinationColumns } from "./table/column";
-import type { IDestination } from "../types/destination.type";
+import { travelPackColumns } from "./table/column";
+import type { ITravelPack } from "../types/travel-pack";
 import LoadingSpinner from "@/features/redirect/pages/Loading";
 
 export default function Index() {
   const { accessToken } = useAuthContext();
-  const { data, isLoading, isError, error } = useAllDestinations(
+  const { data, isLoading, isError, error } = useAllTravelPack(
     accessToken || ""
   );
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <div>Error fetching destination: {String(error)}</div>;
-  console.log(data);
   return (
     <div>
-      <DataTable<IDestination>
+      <DataTable<ITravelPack>
         data={data?.data ?? []}
-        path="/data-destination/create"
-        columns={destinationColumns}
+        path="/data-travel-pack/create"
+        columns={travelPackColumns}
         rowIdKey="id"
-        addSectionLabel="Add New Destination"
+        addSectionLabel="Add New Travel Pack"
       />
     </div>
   );

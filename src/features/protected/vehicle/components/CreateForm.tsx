@@ -42,6 +42,7 @@ import { useAuthContext } from "@/shared/context/authContex";
 import { useCreateVehicle } from "../hooks/useVehicle";
 import { toast } from "sonner";
 import { useUploadImage } from "@/shared/hooks/useStorage";
+import LoadingSpinner from "@/features/redirect/pages/Loading";
 
 const VehicleTypes = {
   CITY_CAR: "CITY_CAR",
@@ -130,21 +131,21 @@ export default function CreateVehicleForm() {
     if (validFiles.length !== files.length) {
       setFieldErrors((prev) => ({
         ...prev,
-        image_urls:
+        image_url:
           "Some files were skipped. Only image_urls under 5MB are allowed.",
       }));
     }
 
     setForm((prev) => ({
       ...prev,
-      image_urls: [...prev.image_url, ...validFiles],
+      image_url: [...prev.image_url, ...validFiles],
     }));
   };
 
   const removeImage = (index: number) => {
     setForm((prev) => ({
       ...prev,
-      image_urls: prev.image_url.filter((_, i) => i !== index),
+      image_url: prev.image_url.filter((_, i) => i !== index),
     }));
   };
 
@@ -241,6 +242,10 @@ export default function CreateVehicleForm() {
         return <Info className="h-4 w-4" />;
     }
   };
+
+  if (isCreating || isUploading) {
+    <LoadingSpinner />;
+  }
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -613,9 +618,7 @@ export default function CreateVehicleForm() {
                 </p>
               </div>
             </div>
-
             <Separator />
-
             {/* Image Upload Section */}
             <div>
               <div className="flex items-center gap-2 mb-6">
