@@ -7,8 +7,11 @@ import {
   useMemo,
 } from "react";
 import Cookies from "js-cookie";
-import type { AuthContextType, User } from "@/features/auth/types/auth.type";
-import { refreshAccessToken } from "@/features/auth/services/auth.service";
+import type {
+  AuthContextType,
+  User,
+} from "@/features/admin/auth/types/auth.type";
+import { refreshAccessToken } from "@/features/admin/auth/services/auth.service";
 import { getTokenRemaining } from "../utils/jwt";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

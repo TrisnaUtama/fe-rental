@@ -5,13 +5,26 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/shared/context/authContex";
 import ProtectedRoute from "./shared/routes/ProtectedRoute";
 import { lazy } from "react";
-import SidebarLayout from "./shared/components/layout/sidebar/sidebar-layout";
+import SidebarLayout from "./shared/components/layout/admin/sidebar/sidebar-layout";
+import CustomerLayout from "./shared/components/layout/customer/sidebar/customer-layout";
 import { pageRoutes } from "./shared/routes/pages.route";
 import { routeConfigs } from "./shared/routes/sidebar.route";
 
-const SignUp = lazy(() => import("./features/auth/pages/SignUpPage"));
-const SignIn = lazy(() => import("./features/auth/pages/SignInPage"));
-const Verified = lazy(() => import("./features/otp/pages/page"));
+// staff
+const SignUpStaff = lazy(
+  () => import("./features/admin/auth/pages/SignUpPage")
+);
+const SignInStaff = lazy(
+  () => import("./features/admin/auth/pages/SignInPage")
+);
+const Verified = lazy(() => import("./features/admin/otp/pages/page"));
+
+// customer
+const LandingPage = lazy(
+  () => import("./features/customer/landing/pages/page")
+);
+
+// redirect
 const Unauthorized = lazy(
   () => import("./features/redirect/pages/Unauthorized")
 );
@@ -25,9 +38,17 @@ export default function App() {
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/verified" element={<Verified />} />
+            <Route
+              path="/landing-page"
+              element={
+                <CustomerLayout>
+                  <LandingPage />
+                </CustomerLayout>
+              }
+            />
+            <Route path="/" element={<SignInStaff />} />
+            <Route path="/sign-up" element={<SignUpStaff />} />
+            <Route path="/staff/verified" element={<Verified />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="*" element={<NotFound />} />
 
