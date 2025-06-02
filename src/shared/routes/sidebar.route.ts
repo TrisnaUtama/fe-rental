@@ -6,17 +6,19 @@ import {
   SearchIcon,
   TreePalmIcon,
   CarFrontIcon,
+  Hotel,
   type LucideIcon,
   PlaneIcon,
 } from "lucide-react";
 import type { Roles } from "@/shared/enum/enum";
 
 // Import your components
-import AdminDashboard from "@/features/protected/dashboard/pages/Dashboard";
-import UserIndex from "@/features/protected/user/pages/page";
-import DestinationIndex from "@/features/protected/destinations/pages/page"
-import VehicleIndex from "@/features/protected/vehicle/pages/page"
-import TravelPackIndex from "@/features/protected/travel-pack/pages/page";
+import AdminDashboard from "@/features/admin/protected/dashboard/pages/Dashboard";
+import UserIndex from "@/features/admin/protected/user/pages/page";
+import DestinationIndex from "@/features/admin/protected/destinations/pages/page";
+import VehicleIndex from "@/features/admin/protected/vehicle/pages/page";
+import TravelPackIndex from "@/features/admin/protected/travel-pack/pages/page";
+import AccomodationIndex from "@/features/admin/protected/acccomodation/pages/page";
 // import DataLibraryPage from "@/pages/data-library";
 // import UserDataPage from "@/pages/data-user";
 // import SettingsPage from "@/pages/settings";
@@ -35,7 +37,7 @@ export interface RouteConfig {
 export const routeConfigs: RouteConfig[] = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "/staff/dashboard",
     icon: LayoutDashboardIcon,
     component: AdminDashboard,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE", "DRIVER"],
@@ -43,7 +45,7 @@ export const routeConfigs: RouteConfig[] = [
   },
   {
     title: "User",
-    url: "/data-user",
+    url: "/staff/data-user",
     icon: User2,
     component: UserIndex,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
@@ -51,7 +53,7 @@ export const routeConfigs: RouteConfig[] = [
   },
   {
     title: "Destination",
-    url: "/data-destination",
+    url: "/staff/data-destination",
     icon: TreePalmIcon,
     component: DestinationIndex,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
@@ -59,15 +61,23 @@ export const routeConfigs: RouteConfig[] = [
   },
   {
     title: "Vehicle",
-    url: "/data-vehicle",
+    url: "/staff/data-vehicle",
     icon: CarFrontIcon,
     component: VehicleIndex,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
     group: "document",
   },
   {
+    title: "Accomodation",
+    url: "/staff/data-accomodation",
+    icon: Hotel,
+    component: AccomodationIndex,
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
+    group: "document",
+  },
+  {
     title: "Travel Pack",
-    url: "/data-travel-pack",
+    url: "/staff/data-travel-pack",
     icon: PlaneIcon,
     component: TravelPackIndex,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
@@ -75,7 +85,7 @@ export const routeConfigs: RouteConfig[] = [
   },
   {
     title: "Settings",
-    url: "/settings",
+    url: "/staff/settings",
     icon: SettingsIcon,
     component: AdminDashboard,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE", "DRIVER"],
@@ -83,7 +93,7 @@ export const routeConfigs: RouteConfig[] = [
   },
   {
     title: "Get Help",
-    url: "/help",
+    url: "/staff/help",
     icon: HelpCircleIcon,
     component: AdminDashboard,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE", "DRIVER"],
@@ -91,7 +101,7 @@ export const routeConfigs: RouteConfig[] = [
   },
   {
     title: "Search",
-    url: "/search",
+    url: "/staff/search",
     icon: SearchIcon,
     component: AdminDashboard,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE", "DRIVER"],
