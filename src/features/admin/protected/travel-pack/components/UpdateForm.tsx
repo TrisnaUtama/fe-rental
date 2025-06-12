@@ -58,10 +58,9 @@ export default function UpdateForm() {
   const { id: travel_pack_id } = useParams<{ id: string }>();
   const { mutateAsync: updateTravelPackAsync, isPending: isCreating } =
     useUpdateTravelPack(accessToken || "");
-  const { data: dataDestinations } = useAllDestinations(accessToken || "");
+  const { data: dataDestinations } = useAllDestinations();
   const { data: dataTravelPack } = useTravelPackById(
     travel_pack_id!,
-    accessToken || ""
   );
   const { mutateAsync: uploadImageAsync, isPending: isUploading } =
     useUploadImage(accessToken || "");

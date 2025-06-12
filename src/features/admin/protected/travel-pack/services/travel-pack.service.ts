@@ -18,21 +18,18 @@ export async function CreateTravelPack(
 }
 
 export async function GetAllTravelPack(
-  token: string
 ): Promise<IResponseGlobal<ITravelPack[]>> {
   return await httpRequest<IResponseGlobal<ITravelPack[]>>(
     `${import.meta.env.VITE_API_KEY}travel/`,
     {
       method: "GET",
       credentials: "include",
-    },
-    token
+    }
   );
 }
 
 export async function FindTravelPackById(
   id: string,
-  token: string
 ): Promise<IResponseGlobal<ITravelPack>> {
   return await httpRequest<IResponseGlobal<ITravelPack>>(
     `${import.meta.env.VITE_API_KEY}travel/${id}`,
@@ -40,7 +37,6 @@ export async function FindTravelPackById(
       method: "GET",
       credentials: "include",
     },
-    token
   );
 }
 

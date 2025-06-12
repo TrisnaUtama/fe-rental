@@ -21,7 +21,6 @@ export async function CreateDestination(
 }
 
 export async function GetAllDestination(
-  token: string
 ): Promise<IResponseGlobal<IDestination[]>> {
   return await httpRequest<IResponseGlobal<IDestination[]>>(
     `${import.meta.env.VITE_API_KEY}destinations/`,
@@ -29,13 +28,11 @@ export async function GetAllDestination(
       method: "GET",
       credentials: "include",
     },
-    token
   );
 }
 
 export async function FindDestinationById(
   id: string,
-  token: string
 ): Promise<IResponseGlobal<IDestination>> {
   return await httpRequest<IResponseGlobal<IDestination>>(
     `${import.meta.env.VITE_API_KEY}destinations/${id}`,
@@ -43,7 +40,6 @@ export async function FindDestinationById(
       method: "GET",
       credentials: "include",
     },
-    token
   );
 }
 

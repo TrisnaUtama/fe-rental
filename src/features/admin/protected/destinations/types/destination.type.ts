@@ -1,3 +1,5 @@
+import type { ITravelPackageDestination } from "../../travel-pack/types/travel-pack";
+
 export interface IDestination {
   id: string;
   name: string;
@@ -9,6 +11,7 @@ export interface IDestination {
   facilities: string[];
   status?: boolean;
   deleted_at?: Date | null;
+  travel_package_destinations: ITravelPackageDestination[]
 }
 
 export interface ICreateDestination {

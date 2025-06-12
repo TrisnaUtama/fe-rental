@@ -29,5 +29,5 @@
       ]
     }
   },
-  "include": ["src"]
+  "include": ["src", "src/types/declaration.d.ts", "src/types/midtrans.d.ts"]
 }

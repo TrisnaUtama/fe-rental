@@ -79,6 +79,9 @@ interface DataTableProps<T> {
   customizeColumnsLabel?: string;
   addSectionLabel?: string;
   tabs?: { value: string; label: string; content: React.ReactNode }[];
+  // --- NEW PROPS ---
+  hideAddButton?: boolean;
+  customFilters?: React.ReactNode;
 }
 
 export function DataTable<T extends object>({
@@ -100,6 +103,9 @@ export function DataTable<T extends object>({
       content: null,
     },
   ],
+  // --- Initialize new props ---
+  hideAddButton = false,
+  customFilters,
 }: DataTableProps<T>) {
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
@@ -184,12 +190,19 @@ export function DataTable<T extends object>({
       className="flex w-full flex-col justify-start gap-6"
     >
       <div className="flex flex-wrap items-center justify-between gap-4 px-4 lg:px-6">
-        <Input
-          placeholder="Search by name"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full max-w-sm"
-        />
+        {/* --- Toolbar: Search and Custom Filters --- */}
+        <div className="flex flex-wrap items-center gap-4">
+            <Input
+            placeholder="Search by name"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full max-w-xs"
+            />
+            {/* --- Slot for custom filters --- */}
+            {customFilters}
+        </div>
+
+        {/* --- Toolbar: Column Visibility and Add Button --- */}
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -224,12 +237,17 @@ export function DataTable<T extends object>({
                 ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="outline" size="sm" onClick={onAddSectionClick}>
-            <PlusIcon />
-            <Link to={path} className="hidden lg:inline">
-              {addSectionLabel}
-            </Link>
-          </Button>
+          
+          {/* --- Conditionally render the "Add" button --- */}
+          {!hideAddButton && (
+            <Button variant="outline" size="sm" onClick={onAddSectionClick}>
+                <PlusIcon />
+                <Link to={path} className="hidden lg:inline">
+                {addSectionLabel}
+                </Link>
+            </Button>
+          )}
+
         </div>
       </div>
       {tabs.map(({ value, content }) => (

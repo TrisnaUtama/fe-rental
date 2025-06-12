@@ -18,15 +18,13 @@ export async function CreateVehicle(
 }
 
 export async function GetAllVehicle(
-  token: string
 ): Promise<IResponseGlobal<IVehicle[]>> {
   return await httpRequest<IResponseGlobal<IVehicle[]>>(
     `${import.meta.env.VITE_API_KEY}vehicles/`,
     {
       method: "GET",
       credentials: "include",
-    },
-    token
+    }
   );
 }
 

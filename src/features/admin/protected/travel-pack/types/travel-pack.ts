@@ -1,4 +1,5 @@
 import type { IAccomodation } from "../../acccomodation/types/accomodation.type";
+import type { IDestination } from "../../destinations/types/destination.type";
 
 export interface ITravelPack {
   travel_itineraries: any;
@@ -9,6 +10,7 @@ export interface ITravelPack {
   name: string;
   duration: number;
   description: string;
+  destinations: IDestination[]
   status: boolean;
   pax_options: TravelPax[];
   travel_package_destinations: ITravelPackageDestination[];
@@ -21,6 +23,7 @@ export interface ICreateTravelPack {
   duration: number;
   description: string;
   pax_options: TravelPax[];
+  accommodation_id?: string;
   travel_package_destinations: {
     destination_id: string;
   }[];
@@ -36,6 +39,7 @@ export interface TravelPax {
 
 export interface ITravelPackageDestination {
   id?: string;
+  destination?:IDestination
   travel_package_id?: string;
   destination_id: string;
   deleted_at?: string;
@@ -43,9 +47,10 @@ export interface ITravelPackageDestination {
 
 export interface ITravel_Itineraries {
   id?: string;
-  destination_id: string;
-  day_number: number;
-  description: string
+  destination_id?: string;
+  day_number?: number;
+  description?: string
+  destination?: IDestination
 }
 
 export interface AddNewItinerariesDto {

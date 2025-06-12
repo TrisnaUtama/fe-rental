@@ -14,11 +14,11 @@ import {
 import type { IVehicle, ICreateVehicle } from "../types/vehicle.type";
 import type { IResponseGlobal } from "@/shared/types/standard-response";
 
-export function useAllVehicle(token: string) {
+export function useAllVehicle() {
   return useQuery({
     queryKey: ["vehicles"],
-    queryFn: () => GetAllVehicle(token),
-    enabled: !!token,
+    queryFn: () => GetAllVehicle(),
+    // enabled: !!token,
   });
 }
 

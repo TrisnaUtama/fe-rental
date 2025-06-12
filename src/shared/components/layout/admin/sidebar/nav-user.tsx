@@ -25,7 +25,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/shared/components/ui/sidebar";
-import { useAuth } from "@/features/admin/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useAuthContext } from "@/shared/context/authContex";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
