@@ -38,13 +38,18 @@ export type Fuel =
 // Booking Status
 export type BookingStatus =
   | "SUBMITTED"
+  | "PAYMENT_PENDING"
   | "RECEIVED"
-  | "IN_PROGRESS"
   | "COMPLETE"
   | "CANCELED"
-  | "REJECTED"
+  | "REJECTED_BOOKING"
+  | "REJECTED_REFUND"
+  | "REJECTED_RESHEDULE" 
+  | "RESCHEDULE_REQUESTED"
+  | "RESCHEDULED"
+  | "REFUND_REQUESTED"
   | "REFUNDED"
-  | "RESCHEDULE";
+  | "CONFIRMED";
 
 // Promo Status
 export type PromoStatus = "ACTIVE" | "EXPIRED" | "UNACTIVE" | "CANCELED";

@@ -9,6 +9,17 @@ import UpdateUserPage from "@/features/admin/protected/user/pages/updatePage";
 import UpdateVehiclePage from "@/features/admin/protected/vehicle/pages/updatePage";
 import UpdateTravelPackPage from "@/features/admin/protected/travel-pack/pages/updatePage";
 import UpdateAccomodationPage from "@/features/admin/protected/acccomodation/pages/updatePage";
+import BookingPageVehicle from "@/features/customer/booking/pages/vehicle/BookingPage";
+import BookingSuccess from "@/features/redirect/pages/success_booking";
+import ListBookingVehicle from "@/features/customer/booking/pages/vehicle/ListBooking";
+import ListBookingTravel from "@/features/customer/booking/pages/travel/ListBooking";
+import DetailBookingVehiclePage from "@/features/customer/booking/pages/vehicle/DetailBookingPage";
+import DetailBookingTravelPage from "@/features/customer/booking/pages/travel/DetailBookingPage";
+import PaymentFinish from "@/features/redirect/pages/finishPayment";
+import PaymentError from "@/features/redirect/pages/errorPayment";
+import PaymentUnfinish from "@/features/redirect/pages/unfinishPayment";
+import BookingPageTravel from "@/features/customer/booking/pages/travel/BookingPage";
+import DetailBookingPage from "@/features/admin/protected/booking/pages/detailPage";
 
 export const pageRoutes = [
   {
@@ -60,5 +71,63 @@ export const pageRoutes = [
     path: "/staff/data-accomodation/update/:id",
     element: UpdateAccomodationPage,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"] as Roles[],
+  },
+  {
+    path: "/staff/detail-booking/:id",
+    element: DetailBookingPage,
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"] as Roles[],
+  },
+];
+
+export const customerRoute = [
+  {
+    path: "/booking-vehicle",
+    element: BookingPageVehicle,
+    roles: ["CUSTOMER"] as Roles[],
+  },
+  {
+    path: "/success-submit-booking",
+    element: BookingSuccess,
+    roles: ["CUSTOMER"] as Roles[],
+  },
+  {
+    path: "/list-booking-vehicle",
+    element: ListBookingVehicle,
+    roles: ["CUSTOMER"] as Roles[],
+  },
+  {
+    path: "/list-booking-travel",
+    element: ListBookingTravel,
+    roles: ["CUSTOMER"] as Roles[],
+  },
+  {
+    path: "/detail-booking-vehicle/:id",
+    element: DetailBookingVehiclePage,
+    roles: ["CUSTOMER"] as Roles[],
+  },
+  {
+    path: "/detail-booking-travel/:id",
+    element: DetailBookingTravelPage,
+    roles: ["CUSTOMER"] as Roles[],
+  },
+  {
+    path: "/payment/finish",
+    element: PaymentFinish,
+    roles: ["CUSTOMER"] as Roles[],
+  },
+  {
+    path: "/payment/error",
+    element: PaymentError,
+    roles: ["CUSTOMER"] as Roles[],
+  },
+  {
+    path: "/payment/unfinish",
+    element: PaymentUnfinish,
+    roles: ["CUSTOMER"] as Roles[],
+  },
+  {
+    path: "/booking-travel-pack",
+    element: BookingPageTravel,
+    roles: ["CUSTOMER"] as Roles[],
   },
 ];

@@ -23,19 +23,19 @@ import type {
 } from "../types/travel-pack";
 import type { IResponseGlobal } from "@/shared/types/standard-response";
 
-export function useAllTravelPack(token: string) {
+export function useAllTravelPack() {
   return useQuery({
     queryKey: ["travel"],
-    queryFn: () => GetAllTravelPack(token),
-    enabled: !!token,
+    queryFn: () => GetAllTravelPack(),
+
   });
 }
 
-export function useTravelPackById(id: string, token: string) {
+export function useTravelPackById(id: string) {
   return useQuery({
     queryKey: ["travel", id],
-    queryFn: () => FindTravelPackById(id, token),
-    enabled: !!token && !!id,
+    queryFn: () => FindTravelPackById(id),
+    enabled: !!id,
   });
 }
 

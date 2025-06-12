@@ -202,14 +202,14 @@ export default function CreateVehicleForm() {
       const data = await createVehicleAsync(submissionPayload);
       if (data.success) {
         toast.success("Success", {
-          description: `Successfuly created ${data.data.name} Destination`,
+          description: `Successfuly created ${data.data.name} vehicle`,
         });
         resetForm();
         navigate("/staff/data-vehicle");
         navigate(0);
       } else {
         toast.error("Failed", {
-          description: `Failed created new destination`,
+          description: `Failed created new vehicle`,
         });
       }
     } catch (err: any) {

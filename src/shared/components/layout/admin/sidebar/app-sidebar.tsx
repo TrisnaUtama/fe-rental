@@ -5,8 +5,8 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuButton,
 } from "@/shared/components/ui/sidebar";
 
 import { NavDocuments } from "@/shared/components/layout/admin/sidebar/nav-documents";
@@ -17,17 +17,17 @@ import { routeConfigs } from "@/shared/routes/sidebar.route";
 
 import { ArrowUpCircleIcon } from "lucide-react";
 import { useAuthContext } from "@/shared/context/authContex";
-import { useLocation } from "react-router-dom";
 import type { Roles } from "@/shared/enum/enum";
 import { Link } from "react-router-dom";
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthContext();
-  const location = useLocation();
+
   if (!user) return null;
 
   const userRole = user.role as Roles;
 
+  // This function remains the same.
   const filterByRole = (group: "main" | "secondary" | "document") =>
     routeConfigs.filter(
       (route) => route.group === group && route.roles.includes(userRole)
@@ -52,11 +52,10 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={filterByRole("main")} activePath={location.pathname} />
-        <NavDocuments
-          items={filterByRole("document")}
-          activePath={location.pathname}
-        />
+        <NavMain items={filterByRole("main")} activePath={""} />
+        
+        <NavDocuments items={filterByRole("document")} />
+
         <NavSecondary items={filterByRole("secondary")} className="mt-auto" />
       </SidebarContent>
 

@@ -17,19 +17,18 @@ import type {
 } from "../types/destination.type";
 import type { IResponseGlobal } from "@/shared/types/standard-response";
 
-export function useAllDestinations(token: string) {
+export function useAllDestinations() {
   return useQuery({
     queryKey: ["destinations"],
-    queryFn: () => GetAllDestination(token),
-    enabled: !!token,
+    queryFn: () => GetAllDestination(),
   });
 }
 
-export function useDestinationById(id: string, token: string) {
+export function useDestinationById(id: string) {
   return useQuery({
     queryKey: ["destinations", id],
-    queryFn: () => FindDestinationById(id, token),
-    enabled: !!token && !!id,
+    queryFn: () => FindDestinationById(id ),
+    enabled:  !!id,
   });
 }
 

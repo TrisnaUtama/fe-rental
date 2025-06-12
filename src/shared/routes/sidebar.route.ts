@@ -9,6 +9,7 @@ import {
   Hotel,
   type LucideIcon,
   PlaneIcon,
+  BookCopy,
 } from "lucide-react";
 import type { Roles } from "@/shared/enum/enum";
 
@@ -19,17 +20,24 @@ import DestinationIndex from "@/features/admin/protected/destinations/pages/page
 import VehicleIndex from "@/features/admin/protected/vehicle/pages/page";
 import TravelPackIndex from "@/features/admin/protected/travel-pack/pages/page";
 import AccomodationIndex from "@/features/admin/protected/acccomodation/pages/page";
-// import DataLibraryPage from "@/pages/data-library";
-// import UserDataPage from "@/pages/data-user";
-// import SettingsPage from "@/pages/settings";
-// import HelpPage from "@/pages/help";
-// import SearchPage from "@/pages/search";
+import BookingIndex from "@/features/admin/protected/booking/pages/page";
+import AwaitingBookingIndex from "@/features/admin/protected/booking/pages/AwaitingReviewPage";
+import RescheduleBookingIndex from "@/features/admin/protected/booking/pages/RequestReschedulePage";
+import ResfundBookingIndex from "@/features/admin/protected/booking/pages/RequestRefundPage";
+import CompleteBookingIndex from "@/features/admin/protected/booking/pages/CompleteBooking";
 
+export interface SubRoute {
+  title: string;
+  url: string;
+  component: React.ComponentType<any>;
+  roles: Roles[];
+}
 export interface RouteConfig {
   title: string;
   url: string;
   icon: LucideIcon;
-  component: React.ComponentType<any>;
+  component?: React.ComponentType<any>;
+  subItems?: SubRoute[];
   roles: Roles[];
   group: "main" | "secondary" | "document";
 }
@@ -106,5 +114,45 @@ export const routeConfigs: RouteConfig[] = [
     component: AdminDashboard,
     roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE", "DRIVER"],
     group: "secondary",
+  },
+  {
+    title: "Bookings",
+    url: "/staff/bookings",
+    icon: BookCopy,
+    group: "document",
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE"],
+    subItems: [
+      {
+        title: "All Bookings",
+        url: "/staff/bookings/all",
+        roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE"],
+        component: BookingIndex,
+      },
+      {
+        title: "Awaiting Review",
+        url: "/staff/bookings/review",
+        roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
+        component: AwaitingBookingIndex,
+      },
+      {
+        title: "Refund Requests",
+        url: "/staff/bookings/refunds",
+        roles: ["SUPERADMIN", "ADMIN_FINANCE"],
+        component: ResfundBookingIndex,
+      },
+      {
+        title: "Reschedule Requests",
+        url: "/staff/bookings/reschedules",
+        roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
+        component: RescheduleBookingIndex,
+      },
+      {
+        title: "Complete Booking",
+        url: "/staff/bookings/to-complete",
+        roles: ["SUPERADMIN", "ADMIN_OPERATIONAL"],
+        component: CompleteBookingIndex,
+      },
+    ],
+    component: undefined,
   },
 ];

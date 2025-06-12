@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="bg-indigo-500 p-2 rounded-lg">
+              <div className="bg-blue-500 p-2 rounded-lg">
                 <CarFront className="h-6 w-6 text-white" />
               </div>
               <span className="text-2xl font-bold">BaliRent</span>
@@ -16,13 +16,13 @@ export default function Footer() {
               Your trusted partner for exploring the beauty of Bali
             </p>
             <div className="flex space-x-4">
-              <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-indigo-500 cursor-pointer transition-colors">
+              <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-blue-500 cursor-pointer transition-colors">
                 <span className="text-xs">f</span>
               </div>
-              <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-indigo-500 cursor-pointer transition-colors">
+              <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-blue-500 cursor-pointer transition-colors">
                 <span className="text-xs">t</span>
               </div>
-              <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-indigo-500 cursor-pointer transition-colors">
+              <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center hover:bg-blue-500 cursor-pointer transition-colors">
                 <span className="text-xs">i</span>
               </div>
             </div>

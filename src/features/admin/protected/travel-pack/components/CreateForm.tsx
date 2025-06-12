@@ -44,7 +44,7 @@ export default function CreateForm() {
   const { accessToken } = useAuthContext();
   const { mutateAsync: createTravelPackAsync, isPending: isCreating } =
     useCreateTravelPack(accessToken || "");
-  const { data: dataDestinations } = useAllDestinations(accessToken || "");
+  const { data: dataDestinations } = useAllDestinations();
   const { data: dataAccomodations } = useAllAccomodation(accessToken || "");
   const { mutateAsync: uploadImageAsync, isPending: isUploading } =
     useUploadImage(accessToken || "");
@@ -66,7 +66,7 @@ export default function CreateForm() {
   } = useZodForm(
     {
       description: "",
-      accomodation_id: "",
+      accommodation_id: "",
       duration: 1,
       name: "",
       image: undefined,
@@ -198,6 +198,7 @@ export default function CreateForm() {
       const uploadedImageResponses = await uploadImageAsync(form.image as File);
       const submissionPayload = {
         ...form,
+        accommodation_id: form.accommodation_id,
         image: uploadedImageResponses.data.url || "",
         travel_itineraries: form.travel_itineraries.filter(
           (item) => item.day_number >= 1
@@ -224,8 +225,10 @@ export default function CreateForm() {
           ...prev,
           ...err.errors,
         }));
+        toast.error("Failed to create travel pack.", {
+          description: `${err.errors}`,
+        });
       } else {
-        console.log(err.message);
         setFieldErrors((prev) => ({
           ...prev,
           general: err.message || "Unknown error occurred",
@@ -442,7 +445,7 @@ export default function CreateForm() {
                       </div>
                       <div>
                         <Label className="text-sm font-medium mb-1.5 block">
-                          Price per Person (IDR)
+                          Price (IDR)
                         </Label>
                         <div className="relative">
                           <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -507,11 +510,11 @@ export default function CreateForm() {
 
                 if (accomodations) {
                   setSelectedAccomodation(accomodations);
-                  handleChange("accomodation_id", selectedId);
+                  handleChange("accommodation_id", selectedId);
                 }
               }}
               value=""
-              error={fieldErrors.accomodation_id}
+              error={fieldErrors.accommodation_id}
               placeholder="Select Accomodation"
               options={(dataAccomodations?.data || []).map(
                 (accomodation: IAccomodation) => ({
@@ -525,7 +528,7 @@ export default function CreateForm() {
                 <div className="flex items-center justify-between mb-3 mt-4"></div>
                 <div className="space-y-4">
                   <div
-                    key={selectedAccomodation.id}
+                    key={selectedAccomodation.name}
                     className="border rounded-lg overflow-hidden"
                   >
                     <div className="flex flex-col md:flex-row">

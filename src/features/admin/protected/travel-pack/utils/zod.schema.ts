@@ -50,7 +50,7 @@ export const TravelPackSchema = z.object({
       })
     )
     .nonempty({ message: "At least one pax option must be provided" }),
-    accomodation_id: z.string().optional()
+    accommodation_id: z.string().optional()
 });
 
 export const UpdateTravelPackSchema = z.object({
