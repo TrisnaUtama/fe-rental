@@ -11,9 +11,7 @@ import {
   Mail,
   Phone,
   Shield,
-  Calendar,
   Lock,
-  ToggleRight,
 } from "lucide-react";
 import { useZodForm } from "@/shared/hooks/useZodForm";
 import { CreateUserSchema } from "../utils/zod.schema";
@@ -45,7 +43,6 @@ export default function CreateUserForm() {
       name: "",
       phone_number: "",
       role: "",
-      status: "",
       year_of_experiences: 0,
     },
     CreateUserSchema
@@ -89,9 +86,9 @@ export default function CreateUserForm() {
     });
   };
 
-  if (isPending ) {
-      <LoadingSpinner />;
-    }
+  if (isPending) {
+    <LoadingSpinner />;
+  }
 
   return (
     <div>
@@ -130,19 +127,20 @@ export default function CreateUserForm() {
                   placeholder="user@example.com"
                   error={fieldErrors.email}
                 />
-
-                {/* Years of Experience */}
-                <FormInput
-                  name="yearsOfExperience"
-                  type="number"
-                  label="Years of Experience"
-                  icon={Calendar}
-                  value={form.year_of_experiences}
-                  onChange={(e) =>
-                    handleChange("year_of_experiences", e.target.value)
-                  }
-                  placeholder="0"
-                  error={fieldErrors.year_of_experiences}
+                {/* Role */}
+                <FormSelect
+                  name="role"
+                  label="Role"
+                  icon={Shield}
+                  value={form.role}
+                  onChange={(e) => handleChange("role", e.target.value)}
+                  error={fieldErrors.role}
+                  options={[
+                    { label: "Admin Operasional", value: "ADMIN_OPERATIONAL" },
+                    { label: "Admin Finance", value: "ADMIN_FINANCE" },
+                    // { label: "Driver", value: "DRIVER" },
+                    { label: "Customer", value: "CUSTOMER" },
+                  ]}
                 />
 
                 {/* Phone Number */}
@@ -157,38 +155,26 @@ export default function CreateUserForm() {
                   error={fieldErrors.phone_number}
                 />
 
-                {/* Status */}
-                <FormSelect
-                  name="status"
-                  label="Status"
-                  icon={ToggleRight}
-                  value={form.status}
-                  onChange={(e) => handleChange("status", e.target.value)}
-                  error={fieldErrors.status}
-                  options={[
-                    { label: "Active", value: "true" },
-                    { label: "Inactive", value: "false" },
-                  ]}
-                />
-
-                {/* Role */}
-                <FormSelect
-                  name="role"
-                  label="Role"
-                  icon={Shield}
-                  value={form.role}
-                  onChange={(e) => handleChange("role", e.target.value)}
-                  error={fieldErrors.status}
-                  options={[
-                    { label: "Admin Operasional", value: "ADMIN_OPERATIONAL" },
-                    { label: "Admin Finance", value: "ADMIN_FINANCE" },
-                    { label: "Driver", value: "DRIVER" },
-                    { label: "Customer", value: "CUSTOMER" },
-                  ]}
-                />
+                {form.role === "DRIVER" && (
+                  <></>
+                  // <>
+                  //   {/* Years of Experience */}
+                  //   <FormInput
+                  //     name="yearsOfExperience"
+                  //     type="number"
+                  //     label="Years of Experience"
+                  //     icon={Calendar}
+                  //     value={form.year_of_experiences}
+                  //     onChange={(e) =>
+                  //       handleChange("year_of_experiences", e.target.value)
+                  //     }
+                  //     placeholder="0"
+                  //     error={fieldErrors.year_of_experiences}
+                  //   />
+                  // </>
+                )}
 
                 {/* Password */}
-                <div className="md:col-span-2">
                   <FormPasswordInput
                     name="password"
                     label="Password"
@@ -200,7 +186,6 @@ export default function CreateUserForm() {
                     error={fieldErrors.password}
                     helperText="Password must be at least 6 characters long"
                   />
-                </div>
               </div>
 
               <div className="flex gap-4 pt-6">

@@ -1,172 +1,200 @@
 import { useState, useMemo } from "react";
 import { useAllBookingUser } from "../../hooks/useBooking";
 import { useAuthContext } from "@/shared/context/authContex";
-import { useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import LoadingSpinner from "@/features/redirect/pages/Loading";
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
-import { DatePickerWithRange } from "@/shared/components/ui/calender-range"; 
-import { Label } from "@/shared/components/ui/label";
-import { ArrowLeft, Search, X } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/shared/components/ui/sheet";
+import { ArrowLeft, SlidersHorizontal } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 import type { BookingStatus } from "../../types/booking.type";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { BookingCardTravel } from "./list/BookingCard";
-import { FilterTabs } from "./list/FilterTabs";
+import { FilterSidebar } from "./list/FilterSidebar";
 import { EmptyStateTravel } from "./list/EmptyState";
-
 
 export default function BookingHistoryTravel() {
   const { accessToken } = useAuthContext();
   const navigate = useNavigate();
-  
-  const [selectedStatus, setSelectedStatus] = useState<BookingStatus | "ALL">("ALL");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [dateFilter, setDateFilter] = useState<DateRange | undefined>(undefined);
 
-  const { data: bookingData, isLoading } = useAllBookingUser(accessToken! || "");
+  const [selectedStatus, setSelectedStatus] = useState<BookingStatus | "ALL">(
+    "ALL"
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFilter, setDateFilter] = useState<DateRange | undefined>(
+    undefined
+  );
+
+  const { data: bookingData, isLoading } = useAllBookingUser(
+    accessToken! || ""
+  );
 
   const filteredBookings = useMemo(() => {
     if (!bookingData?.data) return [];
-
     const query = searchQuery.toLowerCase().trim();
-
     const filtered = bookingData.data.filter((booking) => {
-      if (!booking.travel_package_id) {
+      if (!booking.travel_package_id) return false;
+      if (selectedStatus !== "ALL" && booking.status !== selectedStatus)
         return false;
-      }
-      
-      if (selectedStatus !== "ALL" && booking.status !== selectedStatus) {
-        return false;
-      }
-
       if (dateFilter?.from && dateFilter?.to) {
         const bookingStart = new Date(booking.start_date);
         const bookingEnd = new Date(booking.end_date!);
-        
         const filterStart = new Date(dateFilter.from);
         filterStart.setHours(0, 0, 0, 0);
         const filterEnd = new Date(dateFilter.to);
         filterEnd.setHours(23, 59, 59, 999);
-
-        if (!(bookingStart <= filterEnd && bookingEnd >= filterStart)) {
+        if (!(bookingStart <= filterEnd && bookingEnd >= filterStart))
           return false;
-        }
       }
-
       if (query) {
         const hasMatchingText =
           booking.id.toLowerCase().includes(query) ||
           booking.travel_package?.name.toLowerCase().includes(query);
-        
-        if (!hasMatchingText) {
-          return false;
-        }
+        if (!hasMatchingText) return false;
       }
-
       return true;
     });
-
     return filtered ?? [];
   }, [bookingData, selectedStatus, searchQuery, dateFilter]);
 
   const statusCounts = useMemo(() => {
-    if (!bookingData?.data) {
-        return { ALL: 0 } as Record<BookingStatus | "ALL", number>;
-    }
-    const travelBookings = bookingData.data.filter(b => b.travel_package_id);
-
+    if (!bookingData?.data)
+      return { ALL: 0 } as Record<BookingStatus | "ALL", number>;
+    const travelBookings = bookingData.data.filter((b) => b.travel_package_id);
     const counts = travelBookings.reduce((acc, booking) => {
       const status = booking.status as BookingStatus;
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, {} as Record<BookingStatus, number>);
-
-    return {
-      ALL: travelBookings.length,
-      ...counts,
-    } as Record<BookingStatus | "ALL", number>;
+    return { ALL: travelBookings.length, ...counts } as Record<
+      BookingStatus | "ALL",
+      number
+    >;
   }, [bookingData]);
-
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
-  
+
   const handleClearFilters = () => {
-      setSearchQuery("");
-      setDateFilter(undefined);
-  }
+    setSearchQuery("");
+    setDateFilter(undefined);
+    setSelectedStatus("ALL");
+  };
 
-  const isFilterActive = searchQuery.trim() !== "" || dateFilter !== undefined;
+  const isFilterActive =
+    searchQuery.trim() !== "" ||
+    dateFilter !== undefined ||
+    selectedStatus !== "ALL";
+
+  const filterSidebarProps = {
+    selectedStatus,
+    onStatusChange: setSelectedStatus,
+    statusCounts,
+    searchQuery,
+    onSearchChange: setSearchQuery,
+    dateFilter,
+    onDateChange: setDateFilter,
+    onClearFilters: handleClearFilters,
+    isFilterActive,
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-20">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={() => navigate("/travels")} className="rounded-full">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <h1 className="text-xl font-bold text-gray-900">My Travel Package Bookings</h1>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="grid lg:grid-cols-[280px_1fr] lg:gap-8">
+          {/* --- Desktop Filter Sidebar --- */}
+          <aside className="hidden lg:block py-8">
+            <div className="sticky top-8 space-y-8">
+              {/* The desktop "Back" button, positioned above the filters */}
+              <div className="flex justify-start mb-4">
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/travel")}
+                  className="group text-sm flex items-center gap-2 text-gray-600 hover:text-gray-900 px-2 hover:bg-gray-100"
+                >
+                  <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                  Back
+                </Button>
+              </div>
+              <FilterSidebar {...filterSidebarProps} />
             </div>
-            {isFilterActive && (
-                 <Button variant="ghost" size="sm" onClick={handleClearFilters} className="text-xs text-gray-500">
-                    <X className="w-3 h-3 mr-1"/> Clear Filters
-                 </Button>
+          </aside>
+
+          {/* --- Main Content Area --- */}
+          <main className="py-8">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-2">
+                {/* A separate "Back" button just for mobile screens */}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="lg:hidden h-10 w-10"
+                  onClick={() => navigate(-1)}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  My Travel Bookings
+                </h1>
+              </div>
+
+              <div className="lg:hidden">
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="gap-2">
+                      <SlidersHorizontal className="w-4 h-4" />
+                      Filter
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>Filter Bookings</SheetTitle>
+                    </SheetHeader>
+                    <div className="py-6">
+                      <FilterSidebar {...filterSidebarProps} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </div>
+
+            {filteredBookings.length === 0 ? (
+              <EmptyStateTravel onNewBooking={() => navigate("/travels")} />
+            ) : (
+              <motion.div layout className="space-y-4">
+                <AnimatePresence>
+                  {filteredBookings.map((booking) => (
+                    <motion.div
+                      key={booking.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                    >
+                      <BookingCardTravel
+                        booking={booking}
+                        onViewDetails={() =>
+                          navigate(`/detail-booking-travel/${booking.id}`)
+                        }
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
             )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-            <div>
-              <Label htmlFor="search-query" className="text-xs font-medium text-gray-600">Search by Package Name / ID</Label>
-              <div className="relative mt-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="search-query"
-                  placeholder="e.g., 'Ubud Healing', cmb..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-11 h-11 text-base bg-white border-gray-300 focus-visible:ring-blue-500"
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="date-filter" className="text-xs font-medium text-gray-600">Filter by Date</Label>
-              <div className="mt-1">
-                <DatePickerWithRange  value={dateFilter} onChange={setDateFilter} />
-              </div>
-            </div>
-          </div>
+            <div className="h-20" />
+          </main>
         </div>
-      </header>
-
-      <div className="sticky top-[135px] md:top-[149px] z-10 bg-gray-50/80 backdrop-blur-sm">
-         <FilterTabs
-            selectedStatus={selectedStatus}
-            onStatusChange={setSelectedStatus}
-            statusCounts={statusCounts}
-          />
       </div>
-
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        {filteredBookings.length === 0 ? (
-          <EmptyStateTravel
-            onNewBooking={() => navigate('/travels')} 
-          />
-        ) : (
-          <div className="space-y-4">
-            {filteredBookings.map((booking) => (
-              <BookingCardTravel
-                key={booking.id}
-                booking={booking}
-                onViewDetails={() => navigate(`/detail-booking-travel/${booking.id}`)}
-              />
-            ))}
-          </div>
-        )}
-      </main>
-      <div className="h-20" />
     </div>
   );
 }

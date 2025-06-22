@@ -109,6 +109,7 @@ export interface IBookingVehicle {
 export interface Payment {
   id: string;
   booking_id: string;
+  token?:string
   status: string;
   amount: string;
   payment_method: string;

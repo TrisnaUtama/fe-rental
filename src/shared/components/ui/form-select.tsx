@@ -15,6 +15,7 @@ interface FormSelectProps {
     value: string;
   }[];
   className?: string;
+  disabled?: boolean;
 }
 
 export const FormSelect = ({
@@ -27,6 +28,7 @@ export const FormSelect = ({
   error,
   options,
   className,
+  disabled = false,
 }: FormSelectProps) => {
   return (
     <div>
@@ -41,8 +43,10 @@ export const FormSelect = ({
         name={name}
         value={value}
         onChange={onChange}
+        disabled={disabled} 
         className={cn(
           "mt-1 w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-900",
+          disabled && "bg-gray-100 cursor-not-allowed text-gray-500",
           className
         )}
       >

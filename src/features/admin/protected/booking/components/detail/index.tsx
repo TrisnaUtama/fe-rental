@@ -1,8 +1,6 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useBookingById } from "../../hooks/useBooking";
 import LoadingSpinner from "@/features/redirect/pages/Loading";
-import { Button } from "@/shared/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import { StatusBadge } from "@/features/customer/booking/components/vehicle/list/StatusBadge";
 import type {  BookingStatus } from "../../types/booking.type";
 import { useAuthContext } from "@/shared/context/authContex";
@@ -39,7 +37,6 @@ export default function DetailBookingPage({
 }: AdminBookingDetailPageProps) {
     const { id } = useParams<{ id: string }>();
     const { accessToken } = useAuthContext();
-    const navigate = useNavigate();
     const { data: bookingData, isLoading, isError } = useBookingById(id!, accessToken || "");
 
     if (isLoading) return <LoadingSpinner />;
@@ -49,21 +46,17 @@ export default function DetailBookingPage({
 
     const booking = bookingData.data;
 
-    const latestRefund = booking.Refunds?.filter(r => r.status !== 'CANCELED_BY_USER').pop();
+    const latestRefund = booking.Refunds?.filter(r => r.status !== 'CANCEL').pop();
     const latestReschedule = booking.RescheduleRequests?.filter((r:any) => r.status !== 'CANCELED_BY_USER').pop();
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
                 <header className="mb-8">
-                    <Button variant="ghost" onClick={() => navigate(-1)} className="group text-sm flex items-center gap-2 text-gray-600 hover:text-gray-900 px-0 hover:bg-transparent mb-4">
-                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        Back to Booking List
-                    </Button>
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                         <div>
-                            <p className="text-sm text-gray-500">Reviewing Booking ID</p>
-                            <h1 className="text-3xl font-bold text-gray-900 font-mono">#{booking.id}</h1>
+                            <p className="text-sm text-gray-500">Review Booking by </p>
+                            <h1 className="text-3xl font-bold text-gray-900 font-mono">{booking.users?.name}</h1>
                         </div>
                         <StatusBadge status={booking.status as BookingStatus} />
                     </div>

@@ -103,7 +103,6 @@ export default function SignUpForm() {
     }
   };
 
-  console.log(status);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-4">

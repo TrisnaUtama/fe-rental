@@ -1,106 +1,98 @@
-import { Users, Fuel, Cog, Info, BadgeCheck, ChevronDown, ShoppingCart, CheckCircle, Building2, Calendar, Gauge, Palette } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import type { IVehicle } from "@/features/admin/protected/vehicle/types/vehicle.type";
-import { useCart } from "@/shared/context/cartContext";
+import { Users, Fuel, Cog } from "lucide-react";
+import { motion, type Variants } from "framer-motion";
+import React from "react";
 import type { DateRange } from "react-day-picker";
+import { useCart } from "@/shared/context/cartContext";
 import { Button } from "@/shared/components/ui/button";
-import { VehicleDetailRow } from "./VehicleDetailRow"; 
+
+const currencyFormatter = new Intl.NumberFormat("id-ID", {
+  style: "currency",
+  currency: "IDR",
+  minimumFractionDigits: 0,
+});
 
 function formatVehicleType(type: string) {
   return type.split("_").map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
 }
 
-interface Props {
-  vehicle: IVehicle;
-  onSelect: (id: string | null) => void;
-  selected: boolean;
-  dateRange: DateRange;
-}
+const SpecBadge = ({ icon: Icon, text }: { icon: React.ElementType; text: string | number }) => (
+    <div className="flex items-center gap-1.5 bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs font-semibold">
+        <Icon className="w-3.5 h-3.5" />
+        <span>{text}</span>
+    </div>
+);
 
-export function VehicleCard({ vehicle, onSelect, selected, dateRange }: Props) {
+export function VehicleCard({ vehicle, dateRange }: { vehicle: IVehicle, dateRange: DateRange }) {
   const { addToCart, cart } = useCart();
   const isInCart = cart.some(item => item.vehicle.id === vehicle.id);
 
-  const isExpanded = selected; 
-  const toggleExpansion = () => onSelect(isExpanded ? null : vehicle.id);
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart({ vehicle, dateRange });
+  };
+  
+  const cardVariants: Variants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut" }
+    },
+  };
+
   return (
-    <div
-      className={`group bg-white rounded-2xl shadow-sm overflow-hidden border-2 transition-all duration-300 ${
-        isExpanded ? "border-blue-500 shadow-lg" : "border-transparent hover:border-gray-200"
-      }`}
+    <motion.div
+      variants={cardVariants}
     >
-      <div className="p-5">
-        <div className="flex flex-col md:flex-row gap-5">
-          {/* Image */}
-          <div className="w-full md:w-1/3 h-48 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-            <img src={vehicle.image_url[0] || "/placeholder.svg"} alt={vehicle.name} className="w-full h-full object-cover"/>
+      <Link to="#" className="block group">
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col">
+          <div className="relative h-56 overflow-hidden">
+            <img
+              src={vehicle.image_url[0] || "/placeholder.svg"}
+              alt={vehicle.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
+            />
+            <div className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+              {formatVehicleType(vehicle.type)}
+            </div>
           </div>
+          
+          <div className="p-5 flex flex-col flex-grow">
+            <h3 className="font-bold text-xl text-gray-800 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors">
+              {vehicle.name}
+            </h3>
+            <p className="text-sm text-gray-500 mb-4">{vehicle.brand} • {vehicle.year}</p>
 
-          {/* Core Info */}
-          <div className="flex flex-col flex-1">
-            <span className="text-xs font-semibold text-blue-600 uppercase">{formatVehicleType(vehicle.type)}</span>
-            <h2 className="text-2xl font-bold text-gray-900 mt-1">{vehicle.name}</h2>
-            <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
-              <Info className="w-3 h-3" /> or similar • DPS Airport Terminal
-            </p>
-
-            {/* Key Specs */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 text-sm text-gray-700">
-              <span className="flex items-center gap-2"><Users className="w-4 h-4 text-gray-400" /> {vehicle.capacity} Passengers</span>
-              <span className="flex items-center gap-2 capitalize"><Cog className="w-4 h-4 text-gray-400" /> {vehicle.transmition.toLowerCase()}</span>
-              <span className="flex items-center gap-2 capitalize"><Fuel className="w-4 h-4 text-gray-400" /> {vehicle.fuel.toLowerCase()}</span>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <SpecBadge icon={Users} text={`${vehicle.capacity} Penumpang`} />
+              <SpecBadge icon={Cog} text={vehicle.transmition} />
+              <SpecBadge icon={Fuel} text={vehicle.fuel} />
             </div>
             
-            <div className="mt-auto pt-4 flex items-center gap-4">
-              <Button onClick={toggleExpansion} variant="ghost" className="text-blue-600 font-semibold px-0 hover:bg-transparent">
-                View Details <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+            <div className="flex items-end justify-between mt-auto pt-4 border-t border-dashed">
+              <div>
+                <p className="text-sm text-gray-500">Start from</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {currencyFormatter.format(Number(vehicle.price_per_day))}
+                </p>
+                <p className="text-sm text-gray-500">/ Day</p>
+              </div>
+              <Button
+                  onClick={handleAddToCart}
+                  disabled={isInCart}
+                  size="lg"
+                  className={`transition-all ${isInCart ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-700'}`}
+                  aria-label={isInCart ? 'Ditambahkan ke keranjang' : 'Tambahkan ke keranjang'}
+              >
+                  {isInCart ? "Booked" : "Booking"}
               </Button>
             </div>
           </div>
-
-          {/* Price & CTA */}
-          <div className="md:text-right flex flex-row md:flex-col justify-between items-center md:items-end border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-5 min-w-[180px]">
-            <div className="text-left md:text-right">
-              <p className="text-2xl font-extrabold text-gray-900">
-                Rp {Number(vehicle.price_per_day).toLocaleString("id-ID")}
-              </p>
-              <p className="text-sm text-gray-500">per day</p>
-            </div>
-            <Button
-              onClick={(e) => { e.stopPropagation(); addToCart({ vehicle, dateRange }); }}
-              disabled={isInCart}
-              className="w-full md:w-auto mt-0 md:mt-4 gap-2 transition-all"
-            >
-              {isInCart ? <><CheckCircle className="w-4 h-4" /> In Cart</> : <><ShoppingCart className="w-4 h-4" /> Add to Cart</>}
-            </Button>
-          </div>
         </div>
-      </div>
-
-      {/* Expandable Details Section */}
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1, transition: { type: "spring", duration: 0.5 } }}
-            exit={{ height: 0, opacity: 0, transition: { type: "tween", duration: 0.2 } }}
-            className="overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="bg-gray-50/70 p-5 border-t border-gray-200 space-y-4">
-              <h4 className="font-semibold text-gray-800">Vehicle Specifications</h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-700">
-                  <VehicleDetailRow icon={Building2} label="Brand" value={vehicle.brand} />
-                  <VehicleDetailRow icon={Gauge} label="Kilometer" value={`${vehicle.kilometer.toLocaleString("id-ID")} km`} />
-                  <VehicleDetailRow icon={Calendar} label="Year" value={vehicle.year} />
-                  <VehicleDetailRow icon={BadgeCheck} label="Status" value={vehicle.status} />
-                  <VehicleDetailRow icon={Palette} label="Color" value={vehicle.color} />
-              </div>
-              <p className="text-sm text-gray-600 leading-relaxed pt-2 border-t border-gray-200">{vehicle.description}</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+      </Link>
+    </motion.div>
   );
 }

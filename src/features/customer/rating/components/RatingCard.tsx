@@ -65,7 +65,6 @@ export function UserRatingForm({
       setComment("");
       onRatingSuccess?.();
     } catch (error: any) {
-      console.error("Failed to submit rating:", error);
       if (error.message && error.message.includes("unique constraint")) {
         toast.error("You have already submitted a rating for this item.");
       } else {

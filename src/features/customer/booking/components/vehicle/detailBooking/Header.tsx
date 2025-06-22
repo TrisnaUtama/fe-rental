@@ -9,7 +9,10 @@ interface BookingDetailHeaderProps {
   onBack: () => void;
 }
 
-export function BookingDetailHeader({ booking, onBack }: BookingDetailHeaderProps) {
+export function BookingDetailHeader({
+  booking,
+  onBack,
+}: BookingDetailHeaderProps) {
   return (
     <header className="mb-8">
       <Button
@@ -22,9 +25,8 @@ export function BookingDetailHeader({ booking, onBack }: BookingDetailHeaderProp
       </Button>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <p className="text-sm text-gray-500">Booking ID</p>
           <h1 className="text-3xl font-bold text-gray-900 font-mono">
-            #{booking.id}
+            Hello {booking.users?.name}
           </h1>
         </div>
         <StatusBadge status={booking.status as BookingStatus} />

@@ -1,41 +1,34 @@
 import { Link, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+import React from "react";
 
-export const MenuBar = ({
-  menuBar,
-}: {
-  menuBar: { path: string; icon: React.ReactNode; label: string }[];
-}) => {
-  const location = useLocation();
-  const pathname = location.pathname;
+export const MenuBar = ({ menuBar }: { menuBar: { path: string; icon: React.ReactNode; label: string }[] }) => {
+  const { pathname } = useLocation();
 
   return (
-    <>
-      {Object.entries(menuBar).map(([key, value]) => {
-        const isActive = pathname === value.path;
-
+    // Added flex-wrap and justify-center for better responsiveness on small screens
+    <div className="flex flex-wrap items-center justify-center gap-4 bg-white/10 backdrop-blur-md p-2 rounded-full border border-white/20">
+      {menuBar.map((item) => {
+        const isActive = pathname === item.path;
         return (
-          <div className="flex flex-col items-center group" key={key}>
-            <Link
-              to={value.path}
-              className={`flex items-center justify-center text-center p-4 rounded-xl border transition-all duration-300 group-hover:scale-105
-                ${
-                  isActive
-                    ? "bg-blue-500 border-blue-500 text-white shadow-xl -translate-y-1"
-                    : "bg-white border-gray-100 text-gray-800 shadow-lg hover:bg-blue-500 hover:border-blue-500 hover:text-white hover:shadow-xl hover:-translate-y-1"
-                }`}
-            >
-              <div className="h-6 w-6">{value.icon}</div>
-            </Link>
-            <p
-              className={`mt-3 text-sm font-medium text-gray-700 group-hover:text-blue-500 transition-colors ${
-                isActive && "text-blue-500"
-              }`}
-            >
-              {value.label}
-            </p>
-          </div>
+          <Link
+            key={item.label}
+            to={item.path}
+            className={`relative px-3 sm:px-4 py-2 text-sm font-semibold rounded-full transition-colors ${isActive ? 'text-white' : 'text-white/80 hover:text-white'}`}
+          >
+            <span className="relative z-10 flex items-center gap-2">
+                {item.icon} {item.label}
+            </span>
+            {isActive && (
+              <motion.div
+                layoutId="active-menu-pill"
+                className="absolute inset-0 bg-blue-600 rounded-full"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              />
+            )}
+          </Link>
         );
       })}
-    </>
+    </div>
   );
 };

@@ -14,14 +14,12 @@ export default function Index() {
   useEffect(() => {
     if (data?.data) {
       const today = new Date();
-      // Normalize today's date to midnight for accurate date-only comparison
       today.setHours(0, 0, 0, 0);
 
       const filteredBookings = data.data.filter((booking) => {
-        // Check if the booking status is either 'CONFIRMED' or 'RESCHEDULED'
         const isStatusRelevant = booking.status === "CONFIRMED" || booking.status === "RESCHEDULED";
 
-        let isEndDateToday = false; // Renamed variable for clarity
+        let isEndDateToday = false;
         try {
           if (booking.end_date) {
             const bookingEndDate = new Date(booking.end_date);
@@ -30,8 +28,8 @@ export default function Index() {
             isEndDateToday = bookingEndDate.getTime() === today.getTime();
           }
         } catch (e) {
-          console.error(`Invalid end_date for booking ID: ${booking.id || 'N/A'}, end_date: ${booking.end_date}`, e);
           isEndDateToday = false;
+          throw new Error(`Invalid end_date for booking ID: ${booking.id || 'N/A'}, end_date: ${booking.end_date} ${e}`);
         }
 
         return isStatusRelevant && isEndDateToday;

@@ -10,8 +10,9 @@ import {
   FindUserById,
   GetAllUsers,
   UpdateUser,
+  UploadUsersFromFile,
 } from "../services/user.service";
-import type { IUser, ICreateUser } from "../types/user.type";
+import type { IUser, ICreateUser, IUploadResult } from "../types/user.type";
 import type { IResponseGlobal } from "@/shared/types/standard-response";
 
 export function useAllUsers(token: string) {
@@ -32,11 +33,26 @@ export function useUserById(userId: string, token: string) {
 
 export function useCreateUser(token: string) {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (payload: ICreateUser) => CreateUser(payload, token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+}
+
+export function useUploadUsers(token: string) {
+  const queryClient = useQueryClient();
+  return useMutation<IUploadResult[], Error, File>({
+    mutationFn: async (file: File) => {
+      const response = await UploadUsersFromFile(file, token);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error) => {
+      throw new Error(`Upload failed: ${error}`);
     },
   });
 }
@@ -46,12 +62,12 @@ export function useUpdateUser(
 ): UseMutationResult<
   IResponseGlobal<IUser>,
   Error,
-  { userId: string; data: IUser }
+  { userId: string; data: ICreateUser }
 > {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, data }: { userId: string; data: IUser }) =>
+    mutationFn: ({ userId, data }: { userId: string; data: ICreateUser }) =>
       UpdateUser(userId, data, token),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });

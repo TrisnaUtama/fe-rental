@@ -1,164 +1,168 @@
-import {
-  CarFront,
-  Palmtree,
-  Map,
-  BotMessageSquare,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
+
+import { useAllVehicle } from "@/features/admin/protected/vehicle/hooks/useVehicle";
+import { useAllDestinations } from "@/features/admin/protected/destinations/hooks/useDestinations";
+import { useAllTravelPack } from "@/features/admin/protected/travel-pack/hooks/useTravelPack";
+import { useRecomendations } from "@/features/customer/destination/hooks/useRecomendations";
+import { useAuthContext } from "@/shared/context/authContex";
+
+import LoadingSpinner from "@/features/redirect/pages/Loading";
 import { MenuBar } from "@/shared/components/layout/customer/shared/menubar";
 import { DynamicSearchBar } from "@/shared/components/layout/customer/shared/searchBar";
-import { WhyChoosee } from "@/shared/components/layout/customer/shared/why-choose-us";
+import { WhyChooseUs } from "@/shared/components/layout/customer/shared/why-choose-us";
 import { Testimonial } from "@/shared/components/layout/customer/shared/testimonials";
 import { Cta } from "@/shared/components/layout/customer/shared/cta";
 import { FAQ } from "@/shared/components/layout/customer/shared/FAQ";
-import { useLocation } from "react-router-dom";
 import { DestinationCarousel } from "../destination/carousel";
 import { VehiclesCarousel } from "../vehicle/carousel";
-import { VehicleHeader } from "../vehicle/header";
-import { DestinationHeader } from "../destination/header";
-import { useAllVehicle } from "@/features/admin/protected/vehicle/hooks/useVehicle";
-import { useAllDestinations } from "@/features/admin/protected/destinations/hooks/useDestinations";
-import LoadingSpinner from "@/features/redirect/pages/Loading";
-import { useAuthContext } from "@/shared/context/authContex";
-import type { IDestination } from "@/features/admin/protected/destinations/types/destination.type";
-import { useEffect, useState } from "react";
-import { useRecomendations } from "@/features/customer/destination/hooks/useRecomendations";
-import { useAllTravelPack } from "@/features/admin/protected/travel-pack/hooks/useTravelPack";
 import { TravelPackCarousel } from "../travelpack/carousel";
-import { TravelPackHeader } from "../travelpack/header";
+import type { IDestination } from "@/features/admin/protected/destinations/types/destination.type";
+import { CarFront, Palmtree, Map } from "lucide-react";
 
-const menuBar = [
+import {
+  HeroHeader,
+  DefaultHeader,
+} from "@/shared/components/layout/customer/shared/DefaultHeader";
+
+const menuBarData = [
   { label: "Trips", icon: <Map />, path: "/travel" },
   { label: "Car Rental", icon: <CarFront />, path: "/car-rental" },
   { label: "Destinations", icon: <Palmtree />, path: "/destination" },
-  { label: "AI", icon: <BotMessageSquare />, path: "/ai" },
-];
-
-const testimonials = [
-  {
-    name: "Sarah Johnson",
-    location: "Australia",
-    rating: 5,
-    comment:
-      "Amazing experience exploring Bali! The car rental was smooth and the recommendations were perfect.",
-    avatar: "/placeholder.svg?height=50&width=50",
-  },
-  {
-    name: "David Chen",
-    location: "Singapore",
-    rating: 5,
-    comment:
-      "Best way to explore Bali's hidden gems. Professional service and great vehicles!",
-    avatar: "/placeholder.svg?height=50&width=50",
-  },
-  {
-    name: "Emma Wilson",
-    location: "UK",
-    rating: 5,
-    comment:
-      "The AI recommendations helped us discover places we never would have found. Highly recommended!",
-    avatar: "/placeholder.svg?height=50&width=50",
-  },
 ];
 
 export default function LandingPageLayout() {
-  const [destination, setDestination] = useState<IDestination[]>([]);
+  const [recommendedDestinations, setRecommendedDestinations] = useState<IDestination[]>([]);
+  const [hasFetched, setHasFetched] = useState(false);
+
   const { user, accessToken } = useAuthContext();
-  const { data: dataVehicle } = useAllVehicle();
-  const { data: dataDestination } = useAllDestinations();
-  const { data: dataTravel } = useAllTravelPack();
-  const location = useLocation().pathname;
+  const { data: dataVehicle, isLoading: vLoading } = useAllVehicle();
+  const { data: dataDestination, isLoading: dLoading } = useAllDestinations();
+  const { data: dataTravel, isLoading: tLoading } = useAllTravelPack();
   const { mutateAsync: getRecomendation } = useRecomendations(accessToken!);
+
+  const location = useLocation().pathname;
 
   useEffect(() => {
     const fetchDestinations = async () => {
-      if (!dataVehicle?.data || !dataDestination?.data) return;
+      if (hasFetched || !dataDestination?.data) return;
+
       if (!accessToken || !user) {
-        setDestination(dataDestination.data);
-      } else {
-        try {
-          const response = await getRecomendation(user.id);
-          if (response?.data?.length) {
-            setDestination(response.data);
-          } else {
-            setDestination(dataDestination.data);
-          }
-        } catch (err) {
-          console.error("Failed to fetch recommendations", err);
-          setDestination(dataDestination.data);
+        setRecommendedDestinations(dataDestination.data.slice(0, 8));
+        setHasFetched(true);
+        return;
+      }
+
+      try {
+        const response = await getRecomendation(user.id);
+
+        if (response?.data?.length) {
+          setRecommendedDestinations(response.data);
+        } else {
+          setRecommendedDestinations(dataDestination.data.slice(0, 8));
         }
+      } catch (err) {
+        setRecommendedDestinations(dataDestination.data.slice(0, 8));
+      } finally {
+        setHasFetched(true);
       }
     };
+
     fetchDestinations();
-  }, [accessToken, user, dataDestination, dataVehicle, getRecomendation]);
-  
+  }, [accessToken, user, dataDestination]);
+
   const pageConfigs = {
+    "/": {
+      header: (
+        <DefaultHeader
+          title="Your Adventure Awaits"
+          subtitle="Discover Bali's best-kept secrets with personalized recommendations and premium rentals."
+        />
+      ),
+      mainContent: (
+        <DestinationCarousel popularDestinations={recommendedDestinations} />
+      ),
+      searchType: null,
+    },
     "/car-rental": {
-      header: <VehicleHeader />,
+      header: (
+        <HeroHeader
+          line1="Find the Perfect"
+          highlight="Vehicle"
+          line2="for your journey in Bali"
+          subtitle="Discover the island with our premium, fully-insured, and reliable vehicles."
+        />
+      ),
       mainContent: <VehiclesCarousel vehicles={dataVehicle?.data || []} />,
       searchType: "car-rental" as const,
     },
     "/destination": {
-      header: <DestinationHeader />,
-      mainContent: <DestinationCarousel popularDestinations={destination} />,
-      searchType: null, 
+      header: (
+        <HeroHeader
+          line1="Explore Every"
+          highlight="Destination"
+          line2="the Island of Gods has to offer"
+          subtitle="Discover the beauty of Bali with our AI-powered destination recommendations."
+        />
+      ),
+      mainContent: (
+        <DestinationCarousel popularDestinations={recommendedDestinations} />
+      ),
+      searchType: null,
     },
     "/travel": {
-      header:< TravelPackHeader/>, 
+      header: (
+        <HeroHeader
+          line1="Discover Curated"
+          highlight="Trips"
+          line2="for an unforgettable experience"
+          subtitle="Browse our expertly crafted travel packages designed to showcase the best of Bali."
+        />
+      ),
       mainContent: <TravelPackCarousel travelPack={dataTravel?.data || []} />,
-      searchType: "travel" as const,
+      searchType: null,
     },
   };
 
-  const currentPageConfig = pageConfigs[location as keyof typeof pageConfigs];
+  const currentPageConfig =
+    pageConfigs[location as keyof typeof pageConfigs] || pageConfigs["/"];
 
-
-  if (!dataVehicle?.data || !dataDestination?.data || !dataTravel?.data) {
+  if (vLoading || dLoading || tLoading) {
     return <LoadingSpinner />;
   }
 
-  if (!currentPageConfig) {
-     return (
-        <div className="min-h-screen w-full">
-            <WhyChoosee />
-            <Testimonial testimonials={testimonials} />
-            <FAQ />
-            <Cta />
-        </div>
-     )
-  }
-
   return (
-    <div className="min-h-screen w-full">
-      {/* Hero Section */}
-      <div className="mx-4 my-4">
-        <div className="bg-[#f0f3f5] w-full p-8 rounded-2xl">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center space-y-8">
-              
-              {currentPageConfig.header}
+    <div className="min-h-screen w-full bg-gray-50">
+      <section className="relative min-h-[70vh] md:min-h-[80vh] flex flex-col items-center justify-center text-white text-center p-4">
+        <div className="absolute inset-0 bg-black/50 z-10" />
+        <img
+          src="https://images.unsplash.com/photo-1573790387438-4da905039392?q=80&w=1925&auto=format&fit=crop"
+          alt="Bali landscape"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
 
-              {/* Menu Bar */}
-              <div className="flex gap-8 justify-center items-center flex-wrap">
-                <MenuBar menuBar={menuBar} />
-              </div>
+        <motion.div
+          className="relative z-20 flex flex-col items-center w-full max-w-4xl space-y-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {currentPageConfig.header}
+          <MenuBar menuBar={menuBarData} />
+          {currentPageConfig.searchType && (
+            <DynamicSearchBar pageType={currentPageConfig.searchType} />
+          )}
+        </motion.div>
+      </section>
 
-              {/* 2. Render search bar from config */}
-              {currentPageConfig.searchType && (
-                <DynamicSearchBar pageType={currentPageConfig.searchType} />
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Render main content from config */}
-      {currentPageConfig.mainContent}
-
-      {/* Common Sections that appear on all pages */}
-      <WhyChoosee />
-      <Testimonial testimonials={testimonials} />
-      <FAQ />
-      <Cta />
+      <main>
+        {currentPageConfig.mainContent}
+        <WhyChooseUs />
+        <Testimonial />
+        <FAQ />
+        <Cta />
+      </main>
     </div>
   );
 }

@@ -20,15 +20,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     () => Cookies.get("access_token") || null
   );
 
+  const cookieOptions = {
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Lax" as "Lax", 
+    path: "/",
+  };
+
   const login = useCallback((user: User, accessToken: string) => {
     setUser(user);
-    Cookies.set("user", JSON.stringify(user), {
-      expires: 7,
-      secure: true,
-      sameSite: "Lax",
-      path: "/",
-    });
-    Cookies.get("access_token");
+    Cookies.set("user", JSON.stringify(user), { ...cookieOptions, expires: 7 });
+    Cookies.set("access_token", accessToken, cookieOptions);
+
     setAccessToken(accessToken);
   }, []);
 
@@ -40,21 +42,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const updateAccessToken = useCallback((token: string) => {
+    Cookies.set("access_token", token, cookieOptions);
     setAccessToken(token);
   }, []);
 
+  const updateUser = useCallback((updatedUser: Partial<User>) => {
+    setUser((prevUser) => {
+      if (!prevUser) return null;
+      const newUser = { ...prevUser, ...updatedUser };
+      Cookies.set("user", JSON.stringify(newUser), { ...cookieOptions, expires: 7 });
+      return newUser;
+    });
+  }, []);
+
   useEffect(() => {
+    const rawUser = Cookies.get("user");
+    if (!rawUser) {
+        setIsLoading(false);
+        logout();
+        return;
+    }
+
     const tryRefresh = async () => {
       try {
         const result = await refreshAccessToken();
-        const rawUser = Cookies.get("user");
-        const parsedUser = rawUser ? JSON.parse(rawUser) : null;
-        if (parsedUser) {
-          setUser(parsedUser);
-          updateAccessToken(result.access_token);
-        } else {
-          logout();
-        }
+        const parsedUser = JSON.parse(rawUser);
+        setUser(parsedUser);
+        updateAccessToken(result.access_token);
       } catch (err) {
         logout();
       } finally {
@@ -63,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     tryRefresh();
-  }, [updateAccessToken]);
+  }, [logout, updateAccessToken]); 
 
   useEffect(() => {
     if (!accessToken) return;
@@ -72,19 +86,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { remainingSeconds } = getTokenRemaining(accessToken);
       if (remainingSeconds <= 0) {
         logout();
-        clearInterval(interval);
-        return;
+        return; 
       }
-      if (remainingSeconds < 60) {
+      if (remainingSeconds < 90) {
         try {
-          const result = await refreshAccessToken();
-          updateAccessToken(result.access_token);
+          const currentToken = Cookies.get("access_token");
+          if(accessToken === currentToken) {
+            const result = await refreshAccessToken();
+            updateAccessToken(result.access_token);
+          }
         } catch (err: any) {
           logout();
-          throw new Error(err.message);
         }
       }
-    }, 1000);
+    }, 30 * 1000); 
+
     return () => clearInterval(interval);
   }, [accessToken, updateAccessToken, logout]);
 
@@ -95,10 +111,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       logout,
       updateAccessToken,
       accessToken,
+      updateUser,
+      setUser,
       isAuthenticated: !!user,
       isLoading,
     }),
-    [user, login, logout, updateAccessToken, accessToken, isLoading]
+    [user, login, logout, updateAccessToken, updateUser, accessToken, isLoading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

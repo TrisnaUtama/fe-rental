@@ -139,6 +139,23 @@
   --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
+.swiper-pagination-bullet {
+  background-color: #9ca3af; 
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #2563eb; 
+  width: 24px;
+  border-radius: 9999px;
+}
+
+.swiper-button-disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

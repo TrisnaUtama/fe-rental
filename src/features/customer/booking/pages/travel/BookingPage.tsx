@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { TravelPackBookingProvider } from "@/features/customer/booking/context/TravelPackBookingContext"
 import { BookingTravelPackContainer } from "@/features/customer/booking/components/travel/TravelPackContainer";
+import LoadingSpinner from "@/features/redirect/pages/Loading";
 
 export default function BookingTravelPackPage() {
   const location = useLocation();
@@ -9,7 +10,7 @@ export default function BookingTravelPackPage() {
   if (!initialState?.travelPack) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Error: No travel package details provided. Please select a package first.</p>
+        <LoadingSpinner/>
       </div>
     );
   }

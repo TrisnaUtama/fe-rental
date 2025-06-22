@@ -14,7 +14,6 @@ export const CreateUserSchema = z.object({
   phone_number: z.string().min(1, "Phone number is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.string().min(1, "role is required"),
-  status: z.string().min(1, "status is required"),
   year_of_experiences: z.number(),
 });
 
@@ -24,7 +23,6 @@ export const UpdateUserSchema = z.object({
   phone_number: z.string().min(1, "Phone number is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.string().min(1, "role is required"),
-  status: z.string().min(1, "status is required"),
   year_of_experiences: z.number().nullable(),
 });
 

@@ -6,13 +6,18 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useUpdateBooking, useBookingById } from "../hooks/useBooking";
 import { useAuthContext } from "@/shared/context/authContex";
 import { toast } from "sonner";
-import type { BookingStatus, RefundResponse, ApproveRefundPayload, RejectRefundPayload } from "../types/booking.type";
+import type {
+  BookingStatus,
+  RefundResponse,
+  ApproveRefundPayload,
+  RejectRefundPayload,
+} from "../types/booking.type";
 
 import { useAssignVehicleAndConfirmBooking } from "../hooks/useBooking";
 import { useApproveRefund, useRejectRefund } from "../hooks/useRefund";
 
 import { ApproveRefundModal } from "../components/detail/ApproveRefundModal";
-import { RejectRefundModal } from "../components/detail/RejectModalRefund"; 
+import { RejectRefundModal } from "../components/detail/RejectModalRefund";
 
 export default function DetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,21 +26,25 @@ export default function DetailPage() {
 
   const [isApproveModalOpen, setApproveModalOpen] = useState(false);
   const [isRejectModalOpen, setRejectModalOpen] = useState(false);
-  const [selectedRefund, setSelectedRefund] = useState<RefundResponse | null>(null);
+  const [selectedRefund, setSelectedRefund] = useState<RefundResponse | null>(
+    null
+  );
 
   const { data: dataBooking, isLoading: isBookingDataLoading } = useBookingById(
     id!,
     accessToken || ""
   );
 
-  const { mutateAsync: approveRefund, isPending: isApproving } = useApproveRefund(accessToken || "");
-  const { mutateAsync: rejectRefund, isPending: isRejecting } = useRejectRefund(accessToken || "");
-  
+  const { mutateAsync: approveRefund, isPending: isApproving } =
+    useApproveRefund(accessToken || "");
+  const { mutateAsync: rejectRefund, isPending: isRejecting } = useRejectRefund(
+    accessToken || ""
+  );
+
   const { mutateAsync: updateBooking } = useUpdateBooking(accessToken || "");
   const { mutateAsync: assignVehicle } = useAssignVehicleAndConfirmBooking(
     accessToken || ""
   );
-
 
   const handleUpdateStatus = async (
     bookingId: string,
@@ -84,7 +93,7 @@ export default function DetailPage() {
       const apiErrorMessage =
         error.response?.data?.message || error.message || "Unknown error";
       toast.error(`${errorMessage}: ${apiErrorMessage}`);
-      console.error(errorMessage, error);
+      throw new Error(`${errorMessage}, ${error}`);
     }
   };
 
@@ -109,11 +118,12 @@ export default function DetailPage() {
       toast.success(
         `Vehicles assigned and booking ${bookingId} confirmed successfully!`
       );
+      navigate(0);
     } catch (error: any) {
       toast.error(
         `Failed to assign vehicle: ${error.message || "Unknown error"}`
       );
-      console.error("Failed to assign vehicle", error.message);
+      throw new Error(`Failed to assign vehicle : ${error.message}`);
     }
   };
 
@@ -124,7 +134,9 @@ export default function DetailPage() {
       `Booking ${bookingId} accepted successfully!`,
       `Failed to accept booking ${bookingId}`
     );
-    navigate(-1);
+    setTimeout(() => {
+      navigate(0);
+    }, 2000)
   };
 
   const handleRejectBooking = (bookingId: string) => {
@@ -134,7 +146,9 @@ export default function DetailPage() {
       `Booking ${bookingId} rejected!`,
       `Failed to reject booking ${bookingId}`
     );
-    navigate(-1);
+    setTimeout(() => {
+      navigate(0);
+    }, 2000)
   };
 
   const handleAcceptReschedule = (bookingId: string) => {
@@ -144,7 +158,9 @@ export default function DetailPage() {
       `Reschedule for Booking ${bookingId} accepted!`,
       `Failed to accept reschedule for booking ${bookingId}`
     );
-    navigate(-1);
+    setTimeout(() => {
+      navigate(0);
+    }, 2000)
   };
 
   const handleRejectReschedule = (bookingId: string) => {
@@ -154,7 +170,9 @@ export default function DetailPage() {
       `Reschedule for Booking ${bookingId} rejected!`,
       `Failed to reject reschedule for booking ${bookingId}`
     );
-    navigate(-1);
+    setTimeout(() => {
+      navigate(0);
+    }, 2000);
   };
   const handleCompleteBooking = (bookingId: string) => {
     handleUpdateStatus(
@@ -163,11 +181,15 @@ export default function DetailPage() {
       `Booking with id ${bookingId} is complete`,
       `Failed to complete booking ${bookingId}`
     );
-    navigate(-1);
+    setTimeout(() => {
+      navigate(0);
+    }, 2000);
   };
 
   const handleOpenApproveModal = () => {
-    const pendingRefund = dataBooking?.data?.Refunds?.find(r => r.status === 'PENDING');
+    const pendingRefund = dataBooking?.data?.Refunds?.find(
+      (r) => r.status === "PENDING"
+    );
     if (pendingRefund) {
       setSelectedRefund(pendingRefund);
       setApproveModalOpen(true);
@@ -177,7 +199,9 @@ export default function DetailPage() {
   };
 
   const handleOpenRejectModal = () => {
-     const pendingRefund = dataBooking?.data?.Refunds?.find(r => r.status === 'PENDING');
+    const pendingRefund = dataBooking?.data?.Refunds?.find(
+      (r) => r.status === "PENDING"
+    );
     if (pendingRefund) {
       setSelectedRefund(pendingRefund);
       setRejectModalOpen(true);
@@ -191,24 +215,28 @@ export default function DetailPage() {
     try {
       await approveRefund({ refundId: selectedRefund.id, data: payload });
       toast.success("Refund has been approved and processed successfully.");
-      setApproveModalOpen(false); 
-      navigate(-1);
+      setApproveModalOpen(false);
+      navigate(0);
     } catch (error: any) {
-      toast.error(`Failed to approve refund: ${error.message || 'Unknown error'}`);
+      toast.error(
+        `Failed to approve refund: ${error.message || "Unknown error"}`
+      );
     }
   };
 
   const handleConfirmRejection = async (payload: RejectRefundPayload) => {
-     if (!selectedRefund) return;
+    if (!selectedRefund) return;
     try {
-      console.log(selectedRefund.id);
-      const data = await rejectRefund({ refundId: selectedRefund.id, data: payload });
-      console.log(data.message);
+      await rejectRefund({ refundId: selectedRefund.id, data: payload });
       toast.success("Refund request has been successfully rejected.");
-      setRejectModalOpen(false); 
-      navigate(-1);
+      setRejectModalOpen(false);
+      setTimeout(() => {
+      navigate(0);
+    }, 2000)
     } catch (error: any) {
-      toast.error(`Failed to reject refund: ${error.message || 'Unknown error'}`);
+      toast.error(
+        `Failed to reject refund: ${error.message || "Unknown error"}`
+      );
     }
   };
 
@@ -246,7 +274,7 @@ export default function DetailPage() {
             onClose={() => setApproveModalOpen(false)}
             refund={selectedRefund}
             onConfirm={handleConfirmApproval}
-            isProcessing={isApproving} 
+            isProcessing={isApproving}
           />
           <RejectRefundModal
             isOpen={isRejectModalOpen}

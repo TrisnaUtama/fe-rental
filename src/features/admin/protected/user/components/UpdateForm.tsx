@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/shared/components/ui/button";
@@ -15,8 +13,6 @@ import {
   Mail,
   Phone,
   Shield,
-  Calendar,
-  ToggleRight,
   Lock,
 } from "lucide-react";
 import { useZodForm } from "@/shared/hooks/useZodForm";
@@ -56,12 +52,10 @@ export default function UpdateUserForm() {
       name: "",
       phone_number: "",
       role: "",
-      status: "",
       year_of_experiences: 0,
     },
     UpdateUserSchema
   );
-  const statusForm = data?.data.status ? "true" : "false";
   useEffect(() => {
     if (data?.data) {
       setForm({
@@ -70,7 +64,6 @@ export default function UpdateUserForm() {
         name: data.data.name,
         phone_number: data.data.phone_number,
         role: data.data.role,
-        status: data.data.status ? "true" : "false",
         year_of_experiences: data.data.year_of_experiences,
       });
     }
@@ -79,15 +72,12 @@ export default function UpdateUserForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    const statusBoolean = form.status === "true";
     mutate(
       {
         userId: userId!,
         data: {
           ...form,
           year_of_experiences: Number(form.year_of_experiences),
-          status: statusBoolean,
-          id: "",
         },
       },
       {
@@ -122,7 +112,6 @@ export default function UpdateUserForm() {
         name: data.data.name,
         phone_number: data.data.phone_number,
         role: data.data.role,
-        status: statusForm,
         year_of_experiences: data.data.year_of_experiences,
       });
     }
@@ -155,7 +144,7 @@ export default function UpdateUserForm() {
                   name="name"
                   label="Full Name"
                   icon={User}
-                  value={form.name || ""}
+                  value={form.name}
                   onChange={(e) => handleChange("name", e.target.value)}
                   placeholder="Enter full name"
                   error={fieldErrors.name}
@@ -166,24 +155,25 @@ export default function UpdateUserForm() {
                   name="email"
                   label="Email"
                   icon={Mail}
-                  value={form.email || ""}
+                  value={form.email}
                   onChange={(e) => handleChange("email", e.target.value)}
                   placeholder="user@example.com"
                   error={fieldErrors.email}
                 />
-
-                {/* Years of Experience */}
-                <FormInput
-                  name="yearsOfExperience"
-                  type="number"
-                  label="Years of Experience"
-                  icon={Calendar}
-                  value={form.year_of_experiences || ""}
-                  onChange={(e) =>
-                    handleChange("year_of_experiences", e.target.value)
-                  }
-                  placeholder="0"
-                  error={fieldErrors.year_of_experiences}
+                {/* Role */}
+                <FormSelect
+                  name="role"
+                  label="Role"
+                  icon={Shield}
+                  value={form.role}
+                  onChange={(e) => handleChange("role", e.target.value)}
+                  error={fieldErrors.role}
+                  options={[
+                    { label: "Admin Operasional", value: "ADMIN_OPERATIONAL" },
+                    { label: "Admin Finance", value: "ADMIN_FINANCE" },
+                    // { label: "Driver", value: "DRIVER" },
+                    { label: "Customer", value: "CUSTOMER" },
+                  ]}
                 />
 
                 {/* Phone Number */}
@@ -192,44 +182,32 @@ export default function UpdateUserForm() {
                   type="tel"
                   label="Phone Number"
                   icon={Phone}
-                  value={form.phone_number || ""}
+                  value={form.phone_number}
                   onChange={(e) => handleChange("phone_number", e.target.value)}
                   placeholder="+1 (555) 123-4567"
                   error={fieldErrors.phone_number}
                 />
 
-                {/* Status */}
-                <FormSelect
-                  name="status"
-                  label="Status"
-                  icon={ToggleRight}
-                  value={form.status || ""}
-                  onChange={(e) => handleChange("status", e.target.value)}
-                  error={fieldErrors.status}
-                  options={[
-                    { label: "Active", value: "true" },
-                    { label: "Inactive", value: "false" },
-                  ]}
-                />
-
-                {/* Role */}
-                <FormSelect
-                  name="role"
-                  label="Role"
-                  icon={Shield}
-                  value={form.role}
-                  onChange={(e) => handleChange("role", e.target.value)}
-                  error={fieldErrors.status}
-                  options={[
-                    { label: "Admin Operasional", value: "ADMIN_OPERATIONAL" },
-                    { label: "Admin Finance", value: "ADMIN_FINANCE" },
-                    { label: "Driver", value: "DRIVER" },
-                    { label: "Customer", value: "CUSTOMER" },
-                  ]}
-                />
+                {form.role === "DRIVER" && (
+                  <></>
+                  // <>
+                  //   {/* Years of Experience */}
+                  //   <FormInput
+                  //     name="yearsOfExperience"
+                  //     type="number"
+                  //     label="Years of Experience"
+                  //     icon={Calendar}
+                  //     value={form.year_of_experiences}
+                  //     onChange={(e) =>
+                  //       handleChange("year_of_experiences", e.target.value)
+                  //     }
+                  //     placeholder="0"
+                  //     error={fieldErrors.year_of_experiences}
+                  //   />
+                  // </>
+                )}
 
                 {/* Password */}
-                <div className="md:col-span-2">
                   <FormPasswordInput
                     name="password"
                     label="Password"
@@ -241,7 +219,6 @@ export default function UpdateUserForm() {
                     error={fieldErrors.password}
                     helperText="Password must be at least 6 characters long"
                   />
-                </div>
               </div>
 
               <div className="flex gap-4 pt-6">
@@ -258,7 +235,7 @@ export default function UpdateUserForm() {
                   ) : (
                     <div className="flex items-center gap-2">
                       <User className="h-5 w-5" />
-                      Create User
+                      Update User
                     </div>
                   )}
                 </Button>

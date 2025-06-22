@@ -250,9 +250,9 @@ export default function UpdateVehicleForm() {
       for (const filename of imageToDelete) {
         const deleted = await deleteImageAsync(filename);
         if (!deleted.success) {
-          console.error(`Failed to delete: ${filename}`, deleted.message);
+          throw new Error(`Failed to delete: ${filename} ${deleted.message}`);
         } else {
-          console.log(`Deleted: ${filename}`);
+         throw new Error(`Deleted: ${filename}`);
         }
       }
 

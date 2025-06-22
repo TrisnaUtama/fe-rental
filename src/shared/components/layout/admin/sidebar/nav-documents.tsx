@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { type LucideIcon, ChevronDown } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-// Import animation components from framer-motion
 import { motion, AnimatePresence } from "framer-motion";
 import {
   SidebarGroup,
@@ -11,7 +10,6 @@ import {
   SidebarMenuButton,
 } from "@/shared/components/ui/sidebar";
 
-// Types remain the same
 interface SubItem {
   title: string;
   url: string;
@@ -28,8 +26,6 @@ interface NavDocumentsProps {
   items: NavItem[];
 }
 
-// --- Animation Variants ---
-// Defines the animation for the dropdown container (the <ul> element)
 const containerVariants = {
   open: {
     height: "auto",
@@ -52,7 +48,6 @@ const containerVariants = {
   },
 };
 
-// Defines how each individual sub-item (the <li> element) animates
 const itemVariants = {
   open: {
     y: 0,
@@ -109,7 +104,6 @@ export function NavDocuments({ items }: NavDocumentsProps) {
                   <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
                 </SidebarMenuButton>
 
-                {/* --- ANIMATION WRAPPER (REVISED) --- */}
                 <AnimatePresence>
                   {isOpen && (
                     <motion.ul

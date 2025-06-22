@@ -116,7 +116,7 @@ export function useGetUnavailableDatesForVehicles(vehicleIds: string[]) {
   return useQuery<IResponseGlobal<UnavailableDatesResponse>, Error>({
     queryKey: ['unavailableVehicles', vehicleIds],
     queryFn: () => GetUnavailableDatesForVehicles(vehicleIds),
-
+    enabled: !!vehicleIds && vehicleIds.length > 0, 
   });
 }
 

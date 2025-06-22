@@ -1,128 +1,92 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-
-import { Heart, MapPin, ArrowRight } from "lucide-react";
+import { Navigation, Pagination, Parallax, A11y } from "swiper/modules";
+import {  ArrowRight, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { ITravelPack } from "@/features/admin/protected/travel-pack/types/travel-pack";
+import { Button } from "@/shared/components/ui/button";
+import { motion } from "framer-motion";
+import 'swiper/swiper-bundle.css';
+
+const currencyFormatter = new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 });
 
 const getStartingPrice = (paxOptions: ITravelPack["pax_options"]) => {
-  if (!paxOptions || paxOptions.length === 0) {
-    return null;
-  }
-  const lowestPrice = Math.min(
-    ...paxOptions.map((p) => parseFloat(p.price.toString()))
-  );
-  return lowestPrice;
+  if (!paxOptions || paxOptions.length === 0) return null;
+  return Math.min(...paxOptions.map((p) => parseFloat(p.price.toString())));
 };
 
-const currencyFormatter = new Intl.NumberFormat("id-ID", {
-  style: "currency",
-  currency: "IDR",
-  minimumFractionDigits: 0,
-});
+const TravelPackCard = ({ travelPack }: { travelPack: ITravelPack }) => {
+    const startingPrice = getStartingPrice(travelPack.pax_options);
+    return (
+        <Link to={`/travel/${travelPack.id}`} className="block group">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl shadow-lg">
+                <div data-swiper-parallax="-23%" className="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-105">
+                    <img src={travelPack.image} alt={travelPack.name} className="w-full h-full object-cover"/>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
+                <div className="absolute bottom-0 left-0 p-6 text-white w-full">
+                    <div data-swiper-parallax="-100" className="flex items-center gap-2 text-xs">
+                        <span className="bg-blue-600 px-2 py-1 rounded-full font-semibold">{travelPack.duration} Days</span>
+                        <span className="bg-black/40 px-2 py-1 rounded-full font-semibold">{travelPack.travel_package_destinations?.length} Stops</span>
+                    </div>
+                    <h3 data-swiper-parallax="-200" className="text-2xl font-bold tracking-tight mt-3">{travelPack.name}</h3>
+                    <div data-swiper-parallax="-300" className="mt-4">
+                        <p className="text-sm text-white/80">From</p>
+                        <p className="text-xl font-bold">{startingPrice ? currencyFormatter.format(startingPrice) : "N/A"}</p>
+                    </div>
+                </div>
+            </div>
+        </Link>
+    )
+}
 
-export const TravelPackCarousel = ({
-  travelPack,
-}: {
-  travelPack: ITravelPack[];
-}) => {
+export const TravelPackCarousel = ({ travelPack }: { travelPack: ITravelPack[] }) => {
   return (
-    <section className=" py-20 px-4">
+    <motion.section 
+        className="bg-gray-50 py-20 px-4 overflow-hidden"
+        initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+        viewport={{ once: true, amount: 0.1 }} transition={{ duration: 0.5 }}
+    >
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-              Travel Packages We Offer
-            </h2>
-            <p className="text-base md:text-lg text-gray-600">
-              Explore the most beautiful places with our curated Travel
-              Packages.
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Travel Packages We Offer</h2>
+            <p className="text-base md:text-lg text-gray-600 max-w-xl">Explore the most beautiful places with our curated Travel Packages.</p>
           </div>
-          <Link
-            to="/travels"
-            className="flex items-center font-semibold text-blue-600 hover:text-blue-800 text-sm md:text-base duration-300 transition-all group"
-          >
-            Explore more
-            <ArrowRight className="h-4 w-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
-          </Link>
+          <div className="flex items-center gap-2 flex-shrink-0">
+             <Button variant="outline" size="icon" className="travel-pack-carousel-prev rounded-full w-11 h-11 border-2"><ArrowLeft className="w-5 h-5"/></Button>
+             <Button variant="outline" size="icon" className="travel-pack-carousel-next rounded-full w-11 h-11 border-2"><ArrowRight className="w-5 h-5"/></Button>
+          </div>
         </div>
 
-        {/* Swiper Carousel */}
         <Swiper
-          modules={[Navigation, Pagination]}
+          modules={[Navigation, Pagination, Parallax, A11y]}
           spaceBetween={30}
           slidesPerView={1.2}
           breakpoints={{
-            640: { slidesPerView: 2.2 },
-            768: { slidesPerView: 2.5 },
-            1024: { slidesPerView: 3.5 },
-            1280: { slidesPerView: 4 },
+            640: { slidesPerView: 2.2, spaceBetween: 20 },
+            1024: { slidesPerView: 3.5, spaceBetween: 30 },
           }}
-          navigation
-          pagination={{ clickable: true }}
-          className="!pb-16"
+          navigation={{ nextEl: '.travel-pack-carousel-next', prevEl: '.travel-pack-carousel-prev' }}
+          pagination={{ clickable: true, el: '.travel-pack-carousel-pagination' }}
+          className="travel-pack-carousel"
+          parallax={true}
+          speed={600}
         >
-          {travelPack.map((travel) => {
-            const startingPrice = getStartingPrice(travel.pax_options);
-
-            return (
-              <SwiperSlide key={travel.id}>
-                <Link to={`/travel/${travel.id}`} className="block group">
-                  <div className="bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
-                    <div className="relative h-56 overflow-hidden">
-                      <img
-                        src={travel.image || "/placeholder.svg"}
-                        alt={travel.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-in-out"
-                      />
-                      <div className="absolute top-0 right-0 p-3">
-                        <div className="bg-white/80 backdrop-blur-sm rounded-full p-2 cursor-pointer">
-                          <Heart className="h-5 w-5 text-gray-700 group-hover:text-red-500 transition-colors" />
-                        </div>
-                      </div>
-                      <div className="absolute bottom-0 left-0 bg-blue-600 text-white text-xs font-bold py-1 px-3 rounded-tr-xl">
-                        {travel.duration} {travel.duration > 1 ? "Days" : "Day"}
-                      </div>
-                    </div>
-
-                    <div className="p-5">
-                      <h3 className="font-bold text-xl text-gray-800 line-clamp-1 mb-3">
-                        {travel.name}
-                      </h3>
-                      <div className="flex items-center text-sm text-gray-500 mb-4">
-                        <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                        <span>
-                          {travel.travel_package_destinations?.length || 0}{" "}
-                          Destinations Included
-                        </span>
-                      </div>
-
-                      {/* UI/UX Improvement: Price Display */}
-                      <div className="flex items-end justify-between mt-4">
-                        <div>
-                          <p className="text-sm text-gray-500">From</p>
-                          <p className="text-2xl font-bold text-gray-900">
-                            {startingPrice
-                              ? currencyFormatter.format(startingPrice)
-                              : "N/A"}
-                          </p>
-                        </div>
-                        <div className="text-blue-600 font-semibold group-hover:underline">
-                          Details
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </SwiperSlide>
-            );
-          })}
+          {travelPack.map((pack) => (
+            <SwiperSlide key={pack.id}>
+              <TravelPackCard travelPack={pack}/>
+            </SwiperSlide>
+          ))}
         </Swiper>
+        
+        <div className="flex justify-center md:justify-between items-center mt-8">
+            <Link to="/travels" className="hidden md:flex items-center font-semibold text-blue-600 hover:text-blue-800 duration-300 transition-all group">
+                Explore all Packages <ArrowRight className="h-4 w-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <div className="travel-pack-carousel-pagination !relative !bottom-0 !top-0 !w-auto"></div>
+            <div className="hidden md:block w-[205px]"></div>
+        </div>
       </div>
-    </section>
+    </motion.section>
   );
 };

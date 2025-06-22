@@ -1,6 +1,6 @@
 import { SidebarProvider } from "./sidebar-context";
 import { AppSidebar } from "./sidebar";
-import Navbar from "./site-header";
+import {SiteHeader} from "./site-header";
 import Footer from "./footer"; // <- import your Footer
 
 export default function CustomerLayout({
@@ -13,7 +13,7 @@ export default function CustomerLayout({
       <div className="flex min-h-screen">
         <AppSidebar />
         <div className="flex-1 flex flex-col">
-          <Navbar />
+          <SiteHeader />
 
           {/* Page content takes up remaining space */}
           <main className="flex-1 mt-20">{children}</main>

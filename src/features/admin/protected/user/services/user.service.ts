@@ -1,5 +1,5 @@
 import { httpRequest } from "@/shared/utils/http-client";
-import type { ICreateUser, IUser } from "../types/user.type";
+import type { ICreateUser, IUploadResult, IUser } from "../types/user.type";
 import type { IResponseGlobal } from "@/shared/types/standard-response";
 
 export async function CreateUser(
@@ -20,7 +20,6 @@ export async function CreateUser(
 export async function GetAllUsers(
   token: string
 ): Promise<IResponseGlobal<IUser[]>> {
-  console.log(token);
   return await httpRequest<IResponseGlobal<IUser[]>>(
     `${import.meta.env.VITE_API_KEY}users/`,
     {
@@ -47,7 +46,7 @@ export async function FindUserById(
 
 export async function UpdateUser(
   user_id: string,
-  payload: IUser,
+  payload: ICreateUser,
   token: string
 ): Promise<IResponseGlobal<IUser>> {
   return await httpRequest<IResponseGlobal<IUser>>(
@@ -58,6 +57,24 @@ export async function UpdateUser(
       credentials: "include",
     },
     token
+  );
+}
+
+export async function UploadUsersFromFile(
+  file: File,
+  token: string
+): Promise<IResponseGlobal<IUploadResult[]>> {
+  const formData = new FormData();
+  formData.append("file", file);
+  return await httpRequest<IResponseGlobal<IUploadResult[]>>(
+    `${import.meta.env.VITE_API_KEY}users/upload`,
+    {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    },
+    token,
+    "multipart/form-data"
   );
 }
 

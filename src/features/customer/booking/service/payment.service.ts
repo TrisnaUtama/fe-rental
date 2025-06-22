@@ -38,7 +38,6 @@ export async function UserPaying(
     {
       method: "PATCH",
       credentials: "include",
-      // body: JSON.stringify({payment_method})
     },
     token
   );

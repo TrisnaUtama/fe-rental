@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { BookingDetailHeaderTravel } from './Header';
-import { BookingInfoCardTravel } from './InfoCard';
+import { BookingInfoCard } from './InfoCard';
 import { InvoiceReceiptTravel } from './InvoiceRecepient';
 import { BookingActionsSidebarTravel } from './ActionSidebar';
 import { RequestStatusCard } from "../../vehicle/list/RequestStatusCard";
@@ -31,6 +31,7 @@ export function DetailBookingTravelPage({ booking, onBack, onPayment, onRefund }
     booking.status === "COMPLETE" ||
     booking.status === "REFUND_REQUESTED" || 
     booking.status === "REJECTED_REFUND" ||
+    booking.status === "RESCHEDULED" ||
     booking.status === "REFUNDED";
 
   const handlePrintInvoice = () => {
@@ -90,7 +91,7 @@ export function DetailBookingTravelPage({ booking, onBack, onPayment, onRefund }
                 }}
               />
             )}
-            <BookingInfoCardTravel booking={booking} />
+            <BookingInfoCard booking={booking} />
             {showInvoice && 
                 <div ref={invoiceRef} id="invoice-section">
                     <InvoiceReceiptTravel booking={booking} />

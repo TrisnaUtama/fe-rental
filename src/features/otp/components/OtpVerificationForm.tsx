@@ -213,7 +213,7 @@ export default function OtpVerificationForm() {
 
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
-            <Link to="/staff" className="font-medium text-primary hover:underline">
+            <Link to="/" className="font-medium text-primary hover:underline">
               Back to sign in
             </Link>
           </p>

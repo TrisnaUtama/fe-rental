@@ -16,6 +16,20 @@ export async function GetAllBookings(
   );
 }
 
+export async function GetFullyBookedDatesForVehicles(
+  vehicleIds: string[]
+): Promise<IResponseGlobal<string[]>> { 
+  const idsString = vehicleIds.join(',');
+  const url = `${import.meta.env.VITE_API_KEY}bookings/fully-booked-dates?vehicleIds=${idsString}`;
+  return await httpRequest<IResponseGlobal<string[]>>(
+    url,
+    {
+      method: "GET",
+      credentials: "include", 
+    }
+  );
+}
+
 export async function FindBookingById(
   id: string,
   token: string

@@ -18,7 +18,6 @@ export async function CreateRating(
 }
 
 export async function GetAllRating(
-  token: string
 ): Promise<IResponseGlobal<IRating[]>> {
   return await httpRequest<IResponseGlobal<IRating[]>>(
     `${import.meta.env.VITE_API_KEY}rating/`,
@@ -26,7 +25,6 @@ export async function GetAllRating(
       method: "GET",
       credentials: "include",
     },
-    token
   );
 }
 

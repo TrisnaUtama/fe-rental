@@ -1,10 +1,8 @@
 import {
-  BellIcon,
   LogOutIcon,
   MoreVerticalIcon,
   UserCircleIcon,
 } from "lucide-react";
-
 import {
   Avatar,
   AvatarFallback,
@@ -31,6 +29,9 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import { setConfirmCallback } from "@/lib/confirmDialogCallback";
+import { openDialog } from "@/store/slice/confiramtionDialog";
+import { useDispatch } from "react-redux";
 
 export function NavUser({
   user,
@@ -43,6 +44,7 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const dispatch = useDispatch();
   const Auth = useAuth();
   const navigate = useNavigate();
   const { logout } = useAuthContext();
@@ -63,6 +65,17 @@ export function NavUser({
     setToken(tokenFromCookie);
   }, []);
 
+  const handleLogoutClick = () => {
+    setConfirmCallback(handleLogout);
+    dispatch(
+      openDialog({
+        title: "Logout Confirmation",
+        description: "Are you sure you want to logout?",
+      })
+    );
+  }
+
+  
   const handleLogout = async () => {
     try {
       const result = await Auth.signOut(user.id!, token!);
@@ -84,7 +97,6 @@ export function NavUser({
         });
         navigate("/");
       } else {
-        console.log(result.payload?.toString());
         toast.error("Sign Out failed", {
           description: result.payload?.toString() || "Something Went Wrong",
           position: "bottom-right",
@@ -142,17 +154,13 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/staff/profile")}>
                 <UserCircleIcon />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon />
-                Notifications
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem onClick={handleLogoutClick}>
               <LogOutIcon />
               Log out
             </DropdownMenuItem>

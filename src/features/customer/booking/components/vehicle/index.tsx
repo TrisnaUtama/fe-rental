@@ -26,27 +26,21 @@ export default function BookingHistory() {
 
   const filteredBookings = useMemo(() => {
     if (!bookingData?.data) return [];
-
     const query = searchQuery.toLowerCase().trim();
-
     const filtered = bookingData.data.filter((booking) => {
       if (booking.travel_package_id) {
         return false;
       }
-
       if (selectedStatus !== "ALL" && booking.status !== selectedStatus) {
         return false;
       }
-
       if (dateFilter?.from && dateFilter?.to) {
         const bookingStart = new Date(booking.start_date);
         const bookingEnd = new Date(booking.end_date!);
-        
         const filterStart = new Date(dateFilter.from);
         filterStart.setHours(0, 0, 0, 0);
         const filterEnd = new Date(dateFilter.to);
         filterEnd.setHours(23, 59, 59, 999);
-
         if (!(bookingStart <= filterEnd && bookingEnd >= filterStart)) {
           return false;
         }

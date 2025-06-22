@@ -8,7 +8,6 @@ export default function Index() {
   const { data, isLoading, isError, error } = useAllDestinations();
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <div>Error fetching destination: {String(error)}</div>;
-  console.log(data);
   return (
     <div>
       <DataTable<IDestination>

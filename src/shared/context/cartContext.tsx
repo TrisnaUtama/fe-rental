@@ -41,7 +41,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const parsed = JSON.parse(stored);
       return deserializeCartItems(parsed);
     } catch (err) {
-      console.error("Failed to parse cart from sessionStorage:", err);
       return [];
     }
   });
@@ -55,7 +54,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         
         const existingItem = prevCart.find(cartItem => cartItem.vehicle.id === item.vehicle.id);
         if (existingItem) {
-            console.log("Vehicle already in cart.");
             return prevCart;
         }
         return [...prevCart, item];
@@ -71,7 +69,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const clearCart = useCallback(() => {
-    console.log("Clearing cart...");
     setCart([]);
     sessionStorage.removeItem("cart"); 
   }, []);

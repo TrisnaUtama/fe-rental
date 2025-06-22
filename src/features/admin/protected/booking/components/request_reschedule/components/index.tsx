@@ -23,8 +23,8 @@ export default function Index() {
           bookingStartDate.setHours(0, 0, 0, 0);
           isStartDateNotPassedToday = bookingStartDate >= today;
         } catch (e) {
-          console.error(`Invalid start_date for booking ID: ${booking.id || 'N/A'}, start_date: ${booking.start_date}`, e);
           isStartDateNotPassedToday = false;
+          throw new Error(`Invalid end_date for booking ID: ${booking.id || 'N/A'}, end_date: ${booking.end_date} ${e}`);
         }
 
         return isSubmitted && isStartDateNotPassedToday;

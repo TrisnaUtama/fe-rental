@@ -5,7 +5,6 @@ export function getTokenExpiry(token: string): number | null {
     const decoded = jwtDecode<{ exp: number }>(token);
     return decoded.exp * 1000;
   } catch (e) {
-    console.error("Failed to decode token", e);
     return null;
   }
 }

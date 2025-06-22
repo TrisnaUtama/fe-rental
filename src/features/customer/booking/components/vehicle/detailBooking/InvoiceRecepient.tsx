@@ -8,6 +8,7 @@ const formatRupiah = (value: string | number) =>
     currency: "IDR",
     maximumFractionDigits: 0,
   }).format(Number(value));
+
 const getDayDifference = (start: string, end: string) => {
   if (!start || !end) return 1;
   const diffTime = Math.abs(
@@ -16,16 +17,21 @@ const getDayDifference = (start: string, end: string) => {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
 };
 
-const SummaryRow = ({ label, value }: { label: string; value: string }) => (
+const SummaryRow = ({ label, value, isDiscount = false }: { label: string; value: string; isDiscount?: boolean; }) => (
   <div className="flex justify-between items-center text-sm">
     <span className="text-gray-500">{label}</span>
-    <span className="font-semibold text-gray-800">{value}</span>
+    <span className={`font-semibold ${isDiscount ? 'text-green-600' : 'text-gray-800'}`}>
+      {value}
+    </span>
   </div>
 );
 
 export const InvoiceReceipt = ({ booking }: { booking: BookingResponse }) => {
   const payment = booking.Payments?.[0];
   const days = getDayDifference(booking.start_date, booking.end_date!);
+
+  const subtotal = booking.booking_vehicles!.reduce((sum, { vehicle }) => sum + Number(vehicle.price_per_day), 0) * days;
+  const discountAmount = booking.promos ? subtotal - Number(booking.total_price) : 0;
 
   if (!payment) return null;
 
@@ -117,12 +123,22 @@ export const InvoiceReceipt = ({ booking }: { booking: BookingResponse }) => {
             ))}
           </tbody>
         </table>
+
         <div className="flex justify-end mt-6">
           <div className="w-full max-w-sm space-y-3">
             <SummaryRow
               label="Subtotal"
-              value={formatRupiah(booking.total_price!)}
+              value={formatRupiah(subtotal)}
             />
+            
+            {booking.promos && (
+              <SummaryRow
+                label={`Discount (${booking.promos.code})`}
+                value={`-${formatRupiah(discountAmount)}`}
+                isDiscount={true}
+              />
+            )}
+            
             <div className="border-t-2 border-dashed pt-3">
               <div className="flex justify-between items-baseline">
                 <span className="font-bold text-lg">Total Paid</span>
@@ -133,6 +149,7 @@ export const InvoiceReceipt = ({ booking }: { booking: BookingResponse }) => {
             </div>
           </div>
         </div>
+
         <div className="flex justify-between items-center text-sm text-gray-500 border-t pt-6 mt-6">
           <span>Thank you for choosing us!</span>
           <ScanLine className="w-10 h-10 text-gray-400" />

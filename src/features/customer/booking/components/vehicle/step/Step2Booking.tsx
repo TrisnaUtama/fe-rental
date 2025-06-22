@@ -2,7 +2,24 @@ import { useBooking } from "../../../context/BookingStepperContext";
 import { Label } from "@/shared/components/ui/label";
 import { Checkbox } from "@/shared/components/ui/checkbox";
 import { Textarea } from "@/shared/components/ui/textarea";
-import { Calendar, Tag, FileText, CheckCircle, Plane, User, ArrowRight, Wallet } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/shared/components/ui/radio-group";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
+import {
+  Calendar,
+  Tag,
+  FileText,
+  CheckCircle,
+  Plane,
+  User,
+  ArrowRight,
+  Wallet,
+  ArrowLeft,
+} from "lucide-react";
 import { useUploadImage } from "@/shared/hooks/useStorage";
 import { useAuthContext } from "@/shared/context/authContex";
 import { bookingSchema } from "../../../utils/zod.schema";
@@ -13,12 +30,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/components/ui/button";
 import { useCart } from "@/shared/context/cartContext";
 import LoadingSpinner from "@/features/redirect/pages/Loading";
+import { useAllPromos } from "@/features/admin/protected/promo/hooks/usePromo";
+import type { IPromo } from "@/features/admin/protected/promo/types/promo.type";
 
-const promoOptions = [
-  { code: "", label: "No Promo" },
-  { code: "SUMMER2025", label: "SUMMER2025 - 10% off" },
-  { code: "WEEKEND", label: "WEEKEND - 15% off" },
-];
+// --- HELPER & SUB-COMPONENTS (No logic changes) ---
 
 const formatDate = (isoString: string) => {
   if (!isoString) return "-";
@@ -30,19 +45,47 @@ const formatDate = (isoString: string) => {
   });
 };
 
-const SummaryRow = ({ label, value, isDiscount = false }: { label: string; value: string; isDiscount?: boolean; }) => (
+const currencyFormatter = (amount: number) => {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
+const SummaryRow = ({
+  label,
+  value,
+  isDiscount = false,
+}: {
+  label: string;
+  value: string;
+  isDiscount?: boolean;
+}) => (
   <div className="flex justify-between items-center text-sm">
     <span className="text-gray-500">{label}</span>
-    <span className={`font-semibold ${isDiscount ? 'text-green-600' : 'text-gray-800'}`}>{value}</span>
+    <span
+      className={`font-semibold ${
+        isDiscount ? "text-green-600" : "text-gray-800"
+      }`}
+    >
+      {value}
+    </span>
   </div>
 );
+
+
+// --- MAIN COMPONENT (Refactored for UI/UX) ---
 
 export default function Step2RentalInfo() {
   const { clearCart } = useCart();
   const { accessToken, user } = useAuthContext();
   const { bookingState, setCurrentStep } = useBooking();
-  const { mutateAsync: uploadImageAsync, isPending: isUploading } = useUploadImage(accessToken || "");
-  const { mutateAsync: createBookingVehicle, isPending: isCreating } = useCreateBooking(accessToken || "");
+  const { mutateAsync: uploadImageAsync, isPending: isUploading } =
+    useUploadImage(accessToken || "");
+  const { mutateAsync: createBookingVehicle, isPending: isCreating } =
+    useCreateBooking(accessToken || "");
+  const { data: promoOptions } = useAllPromos(accessToken || "");
   const navigate = useNavigate();
 
   const { form, setForm, setFieldErrors, resetForm } = useZodForm(
@@ -61,59 +104,39 @@ export default function Step2RentalInfo() {
     bookingSchema
   );
 
-  const handlePromoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setForm((prev) => ({
-      ...prev,
-      promoCode: e.target.value,
-    }));
+  const handlePromoSelect = (promoId: string) => {
+    setForm((prev) => ({ ...prev, promo_id: promoId }));
   };
 
   const toggleAirportPickup = () => {
-    setForm((prev) => ({
-      ...prev,
-      pick_up_at_airport: !prev.pick_up_at_airport,
-    }));
+    setForm((prev) => ({ ...prev, pick_up_at_airport: !prev.pick_up_at_airport }));
   };
 
   const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setForm((prev) => ({
-      ...prev,
-      notes: e.target.value,
-    }));
+    setForm((prev) => ({ ...prev, notes: e.target.value }));
   };
 
   const getDays = () => {
     const from = bookingState.bookingDetails[0]?.dateRange.from;
     const to = bookingState.bookingDetails[0]?.dateRange.to;
     if (!from || !to) return 0;
-    const start = new Date(from);
-    const end = new Date(to);
-    const diff = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+    const diff = (new Date(to).getTime() - new Date(from).getTime()) / (1000 * 60 * 60 * 24);
     const days = Math.ceil(diff);
-    return days > 0 ? days : 1; 
+    return days > 0 ? days : 1;
   };
 
-  const getTotal = () => {
-    const pricePerDay = bookingState.bookingDetails.reduce(
-      (sum, v) => sum + Number(v.vehicle.price_per_day),
-      0
-    );
-    let total = pricePerDay * getDays();
+  const subtotal = bookingState.bookingDetails.reduce((sum, v) => sum + Number(v.vehicle.price_per_day), 0) * getDays();
+  const selectedPromo = promoOptions?.data.find((p) => p.id === form.promo_id);
+  const isPromoApplicable = selectedPromo && subtotal >= Number(selectedPromo.min_booking_amount);
 
-    if (bookingState.promoCode === "SUMMER2025") total *= 0.9;
-    if (bookingState.promoCode === "WEEKEND") total *= 0.85;
-
-    return total;
-  };
-  
   const getDiscountAmount = () => {
-    const originalTotal =
-      bookingState.bookingDetails.reduce(
-        (sum, v) => sum + Number(v.vehicle.price_per_day),
-        0
-      ) * getDays();
-    return originalTotal - getTotal();
+    if (isPromoApplicable) {
+      return subtotal * (selectedPromo.discount_value / 100);
+    }
+    return 0;
   };
+
+  const finalTotal = subtotal - getDiscountAmount();
 
   const handleSubmit = async () => {
     try {
@@ -123,6 +146,7 @@ export default function Step2RentalInfo() {
         ...form,
         card_id: uploadedImageCardId.data.url,
         licences_id: uploadedImageLicenseId.data.url,
+        promo_id: isPromoApplicable ? form.promo_id : "",
       };
 
       const data = await createBookingVehicle(submision_payload);
@@ -130,122 +154,192 @@ export default function Step2RentalInfo() {
         toast.success("Success", { description: `Successfully created Vehicles Booking` });
         clearCart();
         resetForm();
-        navigate("/success-submit-booking",  { state: { bookingType: 'vehicle' } });
+        navigate("/success-submit-booking", { state: { bookingType: "vehicle" } });
         navigate(0);
       } else {
         toast.error("Failed", { description: `Failed created new booking` });
       }
     } catch (err: any) {
-      if (err?.errors && typeof err.errors === 'object') {
+      if (err?.errors && typeof err.errors === "object") {
         setFieldErrors((prev: any) => ({ ...prev, ...err.errors }));
       } else {
-        setFieldErrors((prev) => ({ ...prev, general: err.message || 'Unknown error occurred' }));
+        setFieldErrors((prev) => ({ ...prev, general: err.message || "Unknown error occurred" }));
         toast.error("Failed to create booking.");
       }
     }
   };
 
-  const subtotal = bookingState.bookingDetails.reduce((sum, v) => sum + Number(v.vehicle.price_per_day), 0) * getDays();
-  const finalTotal = getTotal() + (form.pick_up_at_airport ? 50000 : 0);
-
-
-console.log(bookingState);
-  if(!bookingState){
-    return <LoadingSpinner/>
+  if (!bookingState) {
+    return <LoadingSpinner />;
   }
 
-  // --- NEW UI STRUCTURE WITH YOUR UNCHANGED LOGIC ---
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900">Review & Confirm</h2>
-        <p className="text-gray-600 mt-2">Just one last look before you confirm your Bali adventure.</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* --- Main Content (Left Column) --- */}
-        <div className="lg:col-span-2 space-y-8">
-
-          {/* --- CARD DETAIL PEMESANAN (GABUNGAN) --- */}
-          <div className="bg-white rounded-2xl border p-6 shadow-sm">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-3">
-              <FileText className="w-6 h-6 text-blue-500" />
-              Your Booking Details
-            </h3>
-            
-            <div className="grid sm:grid-cols-2 gap-4 mb-6 pb-6 border-b">
-              <div className="flex items-center gap-3"><div className="p-2 bg-gray-100 rounded-full"><User className="w-4 h-4 text-gray-600" /></div><div><p className="text-xs text-gray-500">Booking for</p><p className="font-semibold text-sm">{user?.name}</p></div></div>
-              <div className="flex items-center gap-3"><div className="p-2 bg-gray-100 rounded-full"><Calendar className="w-4 h-4 text-gray-600" /></div><div><p className="text-xs text-gray-500">Rental Period ({getDays()} days)</p><p className="font-semibold text-sm flex items-center gap-2">{formatDate(bookingState.bookingDetails[0]?.dateRange.from)}<ArrowRight className="w-3 h-3 text-gray-400" />{formatDate(bookingState.bookingDetails[0]?.dateRange.to)}</p></div></div>
-            </div>
-            
-            <h4 className="text-base font-semibold text-gray-700 mb-4">Selected Vehicle(s)</h4>
-            <div className="space-y-4">
-              {bookingState.bookingDetails.length ? bookingState.bookingDetails.map(({ vehicle }) => (
-                <div key={vehicle.id} className="flex items-center gap-4 p-4 border rounded-lg bg-gray-50">
-                  <img src={vehicle.image_url[0]} alt={vehicle.name} className="w-24 h-16 object-cover rounded-md flex-shrink-0" />
-                  <div className="flex-1"><p className="font-semibold text-gray-800">{vehicle.name}</p><p className="text-xs text-gray-500 capitalize">{vehicle.type.replace("_", " ").toLowerCase()}</p></div>
-                  <div className="text-right"><p className="font-bold text-gray-800">Rp {Number(vehicle.price_per_day).toLocaleString("id-ID")}</p><p className="text-xs text-gray-500">/ day</p></div>
-                </div>
-              )) : (
-                <div className="text-center py-10 text-gray-500">No vehicles selected.</div>
-              )}
-            </div>
-          </div>
-
-          {/* --- KARTU OPSI TAMBAHAN (DESAIN ULANG) --- */}
-          <div className="bg-white rounded-2xl border p-6 shadow-sm">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-3">
-              <Tag className="w-6 h-6 text-blue-500" />
-              Add-ons & Preferences
-            </h3>
-            <div className="space-y-6">
-              <div className="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-4"><Plane className="w-5 h-5 text-gray-500 flex-shrink-0" /><div><Label htmlFor="pickup-airport" className="font-semibold text-gray-800 cursor-pointer">Airport Pickup Service</Label><p className="text-xs text-gray-500">We'll meet you at the arrival terminal.</p></div></div>
-                <div className="flex items-center gap-4"><span className="text-sm font-semibold">+Rp 50,000</span><Checkbox id="pickup-airport" checked={form.pick_up_at_airport} onCheckedChange={toggleAirportPickup} /></div>
-              </div>
-
-              <div className="space-y-2 pt-6 border-t">
-                <Label htmlFor="promoCode" className="font-medium text-gray-800">Promo Code</Label>
-                <div className="flex gap-2">
-                  <select id="promoCode" name="promoCode" value={bookingState.promoCode || ""} onChange={handlePromoChange} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    {promoOptions.map(({ code, label }) => <option key={code} value={code}>{label}</option>)}
-                  </select>
-                  <Button variant="outline">Apply</Button>
-                </div>
-                {getDiscountAmount() > 0 && (<p className="text-xs text-green-600 flex items-center gap-1 mt-2"><CheckCircle className="w-4 h-4" />You're saving Rp {getDiscountAmount().toLocaleString("id-ID")}!</p>)}
-              </div>
-
-              <div className="space-y-2 pt-6 border-t">
-                <Label htmlFor="notes" className="font-medium text-gray-800">Additional Notes</Label>
-                <Textarea id="notes" placeholder="e.g. Flight number, special arrival time, or other requests..." value={form.notes || ""} onChange={handleNoteChange} />
-              </div>
-            </div>
-          </div>
+    <div className="bg-slate-50 min-h-screen">
+      <div className="container mx-auto max-w-7xl px-4 py-12">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Review & Confirm Your Rental</h1>
+          <p className="mt-2 text-lg text-gray-600">
+            One final look before you confirm your vehicle booking.
+          </p>
         </div>
 
-        {/* --- Sidebar (Right) - KARTU RINGKASAN HARGA (DESAIN ULANG) --- */}
-        <div className="lg:col-span-1">
-          <div className="lg:sticky lg:top-24 space-y-6">
-            <div className="bg-white rounded-2xl border p-6 shadow-sm">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-3"><Wallet className="w-6 h-6 text-blue-500" />Price Summary</h3>
-              <div className="space-y-3 pb-6 border-b">
-                <SummaryRow label={`Subtotal (${getDays()} days)`} value={`Rp ${subtotal.toLocaleString("id-ID")}`} />
-                {getDiscountAmount() > 0 && <SummaryRow label="Promo Discount" value={`-Rp ${getDiscountAmount().toLocaleString("id-ID")}`} isDiscount />}
-                {form.pick_up_at_airport && <SummaryRow label="Airport Pickup" value={`+Rp 50,000`} />}
-              </div>
-              <div className="flex justify-between items-center pt-6">
-                <span className="text-lg font-bold text-gray-900">Total Price</span>
-                <span className="text-2xl font-extrabold text-blue-600">Rp {finalTotal.toLocaleString("id-ID")}</span>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <Button onClick={handleSubmit} disabled={isUploading || isCreating} size="lg" className="w-full h-12 text-base">
-                {isCreating || isUploading ? "Submitting..." : "Confirm & Submit Booking"}
-              </Button>
-              <Button onClick={() => setCurrentStep(0)} variant="outline" size="lg" className="w-full h-12 text-base">
-                Back to Selection
-              </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12 items-start">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-8">
+            <Card className="rounded-xl shadow-md">
+              <CardHeader className="border-b">
+                <CardTitle className="flex items-center gap-3">
+                  <FileText className="w-6 h-6 text-blue-600" />
+                  Your Booking Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid sm:grid-cols-2 gap-6 mb-6 pb-6 border-b">
+                  <div className="flex items-center gap-4">
+                     <User className="w-8 h-8 text-gray-400 flex-shrink-0" />
+                     <div>
+                       <p className="text-sm text-gray-500">Booking for</p>
+                       <p className="font-semibold text-gray-800">{user?.name}</p>
+                     </div>
+                  </div>
+                   <div className="flex items-center gap-4">
+                     <Calendar className="w-8 h-8 text-gray-400 flex-shrink-0" />
+                     <div>
+                       <p className="text-sm text-gray-500">Rental Period ({getDays()} days)</p>
+                       <p className="font-semibold text-gray-800 flex items-center gap-2">
+                         {formatDate(bookingState.bookingDetails[0]?.dateRange.from)}
+                         <ArrowRight className="w-4 h-4 text-gray-400" />
+                         {formatDate(bookingState.bookingDetails[0]?.dateRange.to)}
+                       </p>
+                     </div>
+                  </div>
+                </div>
+
+                <h4 className="text-base font-semibold text-gray-700 mb-4">Selected Vehicle(s)</h4>
+                {/* Scrollable Vehicle List */}
+                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-3">
+                  {bookingState.bookingDetails.length ? (
+                    bookingState.bookingDetails.map(({ vehicle }) => (
+                      <div key={vehicle.id} className="flex items-center gap-4 p-4 border rounded-lg bg-gray-50/80">
+                        <img src={vehicle.image_url[0]} alt={vehicle.name} className="w-28 h-20 object-cover rounded-md flex-shrink-0"/>
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-800">{vehicle.name}</p>
+                          <p className="text-sm text-gray-500 capitalize">{vehicle.type.replace("_", " ").toLowerCase()}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-gray-800">{currencyFormatter(Number(vehicle.price_per_day))}</p>
+                          <p className="text-xs text-gray-500">/ day</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-10 text-gray-500">No vehicles selected.</div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-xl shadow-md">
+                <CardHeader className="border-b">
+                    <CardTitle className="flex items-center gap-3">
+                        <Tag className="w-6 h-6 text-blue-600" />
+                        Preferences & Promotions
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                    {/* Airport Pickup */}
+                    <div className="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50/80 transition-colors">
+                        <div className="flex items-center gap-4">
+                            <Plane className="w-6 h-6 text-gray-500 flex-shrink-0" />
+                            <div>
+                                <Label htmlFor="pickup-airport" className="font-semibold text-gray-800 cursor-pointer">
+                                    Airport Pickup Service
+                                </Label>
+                                <p className="text-sm text-gray-500">We'll meet you at the arrival terminal.</p>
+                            </div>
+                        </div>
+                        <Checkbox id="pickup-airport" checked={form.pick_up_at_airport} onCheckedChange={toggleAirportPickup} className="w-5 h-5"/>
+                    </div>
+                    
+                    {/* Promos */}
+                    <div className="space-y-3 pt-6 border-t">
+                        <Label className="font-semibold text-gray-700">Available Promos</Label>
+                        {/* Scrollable Promo List */}
+                        <RadioGroup value={form.promo_id} onValueChange={handlePromoSelect} className="space-y-3 max-h-[300px] overflow-y-auto pr-3">
+                            <div className="flex items-start space-x-4 p-3 border rounded-lg transition-all cursor-pointer hover:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-600">
+                                <RadioGroupItem value="" id="no-promo" />
+                                <Label htmlFor="no-promo" className="w-full cursor-pointer font-medium text-gray-700">
+                                    Continue without a promotion
+                                </Label>
+                            </div>
+                            {promoOptions?.data.map((promo: IPromo) => {
+                                const isPromoDisabled = subtotal < Number(promo.min_booking_amount);
+                                return (
+                                <div key={promo.id} className={`flex items-start space-x-4 p-3 border rounded-lg transition-all ${isPromoDisabled ? "opacity-60 bg-gray-50 cursor-not-allowed" : "cursor-pointer hover:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-600"}`}>
+                                    <RadioGroupItem value={promo.id} id={promo.id} disabled={isPromoDisabled} />
+                                    <Label htmlFor={promo.id} className={`grid gap-1.5 w-full ${isPromoDisabled ? "" : "cursor-pointer"}`}>
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-semibold text-gray-900">{promo.code}</span>
+                                        <span className="font-bold text-base text-emerald-600">{promo.discount_value}% OFF</span>
+                                    </div>
+                                    {promo.min_booking_amount && Number(promo.min_booking_amount) > 0 && (
+                                        <p className={`text-xs ${subtotal >= Number(promo.min_booking_amount) ? "text-gray-500" : "text-red-500 font-medium"}`}>
+                                            Min. purchase of {currencyFormatter(Number(promo.min_booking_amount))}
+                                        </p>
+                                    )}
+                                    </Label>
+                                </div>
+                                );
+                            })}
+                        </RadioGroup>
+                        {isPromoApplicable && (
+                            <div className="!mt-4 text-sm font-semibold text-emerald-700 flex items-center gap-2 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                                <CheckCircle className="w-5 h-5" />
+                                Promo "{selectedPromo?.code}" applied!
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* Notes */}
+                    <div className="space-y-3 pt-6 border-t">
+                        <Label htmlFor="notes" className="font-semibold text-gray-700">Additional Notes</Label>
+                        <Textarea id="notes" placeholder="e.g. Flight number, special arrival time, or other requests..." value={form.notes || ""} onChange={handleNoteChange} className="h-24"/>
+                    </div>
+                </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column (Sticky) */}
+          <div className="lg:col-span-1 lg:sticky lg:top-24">
+            <div className="space-y-6">
+                <Card className="rounded-xl shadow-lg bg-white">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-3 text-lg">
+                            <Wallet className="w-6 h-6 text-blue-600" />
+                            Price Summary
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="space-y-2 pb-4 border-b">
+                            <SummaryRow label={`Subtotal (${getDays()} days)`} value={currencyFormatter(subtotal)} />
+                            {isPromoApplicable && (
+                                <SummaryRow label={`Promo (${selectedPromo.code})`} value={`-${currencyFormatter(getDiscountAmount())}`} isDiscount />
+                            )}
+                        </div>
+                        <div className="flex justify-between items-center pt-4">
+                            <span className="text-base font-bold text-gray-900">Total Price</span>
+                            <span className="text-2xl font-extrabold text-blue-600">{currencyFormatter(finalTotal)}</span>
+                        </div>
+                    </CardContent>
+                </Card>
+                <div className="space-y-3">
+                    <Button onClick={handleSubmit} disabled={isUploading || isCreating} size="lg" className="w-full h-12 text-base font-bold gap-2 bg-blue-600 hover:bg-blue-700">
+                        {isUploading || isCreating ? "Submitting..." : "Confirm & Submit Booking"}
+                    </Button>
+                    <Button onClick={() => setCurrentStep(0)} variant="outline" size="lg" className="w-full h-12 text-base">
+                        <ArrowLeft className="w-4 h-4 mr-2" /> Back to Edit
+                    </Button>
+                </div>
             </div>
           </div>
         </div>

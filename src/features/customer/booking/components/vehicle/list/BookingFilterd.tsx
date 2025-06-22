@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { Filter } from "lucide-react";
-import type { BookingStatus } from "../../../types/booking.type"; // Ensure this path is correct
+import type { BookingStatus } from "../../../types/booking.type"; 
 
 interface BookingFilterProps {
   selectedStatus: BookingStatus | "ALL";
@@ -24,12 +24,10 @@ const statusOptions: Array<{ value: BookingStatus | "ALL"; label: string }> = [
   { value: "CANCELED", label: "Canceled" },
   { value: "COMPLETE", label: "Ready to Go" },
   
-  // Specific Rejection Statuses
   { value: "REJECTED_BOOKING", label: "Booking Rejected" }, 
   { value: "REJECTED_REFUND", label: "Refund Rejected" }, 
   { value: "REJECTED_RESHEDULE", label: "Reschedule Rejected" },
   
-  // Request & Confirmation Statuses
   { value: "RESCHEDULE_REQUESTED", label: "Reschedule Request" },
   { value: "RESCHEDULED", label: "Rescheduled" }, 
   { value: "REFUND_REQUESTED", label: "Refund Request" },

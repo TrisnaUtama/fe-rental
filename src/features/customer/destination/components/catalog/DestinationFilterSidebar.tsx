@@ -1,14 +1,43 @@
+import { useState } from "react";
 import { Input } from "@/shared/components/ui/input";
-import { Label } from "@/shared/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/shared/components/ui/select";
 import { Button } from "@/shared/components/ui/button";
-import { Search, RotateCcw, LayoutGrid } from "lucide-react";
+import { Search, RotateCcw, LayoutGrid, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const FilterSection = ({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) => {
+  const [isOpen, setIsOpen] = useState(true);
+  return (
+    <div className="py-6 border-b">
+      <button className="w-full flex justify-between items-center" onClick={() => setIsOpen(!isOpen)}>
+        <div className="flex items-center gap-3">
+            <Icon className="w-5 h-5 text-blue-600"/>
+            <h4 className="font-semibold text-gray-800">{title}</h4>
+        </div>
+        <motion.div animate={{ rotate: isOpen ? 0 : -90 }}>
+          <ChevronDown className="w-5 h-5 text-gray-500 transition-colors" />
+        </motion.div>
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="content" initial="collapsed" animate="open" exit="collapsed"
+            variants={{
+              open: { opacity: 1, height: "auto", marginTop: "20px" },
+              collapsed: { opacity: 0, height: 0, marginTop: "0px" },
+            }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 interface Props {
   searchQuery: string;
@@ -20,42 +49,27 @@ interface Props {
 }
 
 export function DestinationFilterSidebar({
-  searchQuery,
-  setSearchQuery,
-  categoryFilter,
-  setCategoryFilter,
-  uniqueCategories,
-  onReset,
+  searchQuery, setSearchQuery, categoryFilter, setCategoryFilter, uniqueCategories, onReset,
 }: Props) {
   return (
-    <aside className="sticky top-24 bg-white p-6 rounded-2xl shadow-lg border space-y-8">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Filters</h3>
-        <Button onClick={onReset} variant="ghost" size="sm" className="text-xs text-gray-500">
-          <RotateCcw className="w-3 h-3 mr-1" /> Reset
+    <motion.aside 
+        className="sticky top-8 bg-white p-6 rounded-2xl shadow-lg border space-y-2"
+        initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, ease: "easeOut" }}
+    >
+      <div className="flex items-center justify-between pb-4">
+        <h3 className="text-xl font-bold">Filters</h3>
+        <Button onClick={onReset} variant="ghost" size="sm" className="text-sm text-gray-500 hover:bg-gray-100">
+          <RotateCcw className="w-4 h-4 mr-2" /> Reset
         </Button>
       </div>
       
-      {/* Search Filter */}
-      <div className="space-y-2">
-        <Label htmlFor="search" className="flex items-center gap-2 font-medium">
-          <Search className="w-4 h-4" /> Search
-        </Label>
-        <Input
-          id="search"
-          placeholder="e.g., 'Uluwatu', 'beach'..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
+      <FilterSection title="Search by Name" icon={Search}>
+          <Input id="search" placeholder="e.g., 'Uluwatu', 'beach'..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+      </FilterSection>
 
-      {/* Category Filter */}
-      <div className="space-y-2">
-        <Label htmlFor="category" className="flex items-center gap-2 font-medium">
-          <LayoutGrid className="w-4 h-4" /> Category
-        </Label>
+      <FilterSection title="Category" icon={LayoutGrid}>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger id="category">
+          <SelectTrigger>
             <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
@@ -67,7 +81,7 @@ export function DestinationFilterSidebar({
             ))}
           </SelectContent>
         </Select>
-      </div>
-    </aside>
+      </FilterSection>
+    </motion.aside>
   );
 }

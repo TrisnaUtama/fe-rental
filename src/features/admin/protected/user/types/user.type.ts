@@ -16,7 +16,13 @@ export interface ICreateUser {
   email: string;
   phone_number: string;
   role: string;
-  status: string;
   year_of_experiences: number;
+}
+
+export interface IUploadResult {
+  status: 'success' | 'error' | 'skipped';
+  email?: string;
+  reason?: string;
+  data?: IUser;
 }
 

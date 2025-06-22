@@ -120,4 +120,4 @@ export type BookingStatus =
   | "APPROVED"
   | "COMPLETED"
   | "REJECTED"
-  | "CANCELED_BY_USER";
+  | "CANCEL";

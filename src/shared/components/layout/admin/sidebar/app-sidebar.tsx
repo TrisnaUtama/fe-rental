@@ -8,13 +8,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/shared/components/ui/sidebar";
-
 import { NavDocuments } from "@/shared/components/layout/admin/sidebar/nav-documents";
 import { NavMain } from "@/shared/components/layout/admin/sidebar/nav-main";
 import { NavSecondary } from "@/shared/components/layout/admin/sidebar/nav-secondary";
 import { NavUser } from "@/shared/components/layout/admin/sidebar/nav-user";
-import { routeConfigs } from "@/shared/routes/sidebar.route";
-
+import { routeConfigs, getRoutesByRole, type RouteConfig } from "@/shared/routes/sidebar.route"; 
 import { ArrowUpCircleIcon } from "lucide-react";
 import { useAuthContext } from "@/shared/context/authContex";
 import type { Roles } from "@/shared/enum/enum";
@@ -22,16 +20,24 @@ import { Link } from "react-router-dom";
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuthContext();
-
   if (!user) return null;
-
   const userRole = user.role as Roles;
 
-  // This function remains the same.
-  const filterByRole = (group: "main" | "secondary" | "document") =>
-    routeConfigs.filter(
-      (route) => route.group === group && route.roles.includes(userRole)
-    );
+  const accessibleRoutes = React.useMemo(() => {
+    return getRoutesByRole(routeConfigs, userRole);
+  }, [userRole]);
+
+  const navMainItems: RouteConfig[] = React.useMemo(() => {
+    return accessibleRoutes.filter((route) => route.group === "main");
+  }, [accessibleRoutes]);
+
+  const navDocumentsItems: RouteConfig[] = React.useMemo(() => {
+    return accessibleRoutes.filter((route) => route.group === "document");
+  }, [accessibleRoutes]);
+
+  const navSecondaryItems: RouteConfig[] = React.useMemo(() => {
+    return accessibleRoutes.filter((route) => route.group === "secondary");
+  }, [accessibleRoutes]);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -42,9 +48,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <Link to="/">
+              <Link to="/staff/dashboard">
                 <ArrowUpCircleIcon className="h-5 w-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="text-base font-semibold">BBT</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -52,11 +58,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={filterByRole("main")} activePath={""} />
-        
-        <NavDocuments items={filterByRole("document")} />
-
-        <NavSecondary items={filterByRole("secondary")} className="mt-auto" />
+        <NavMain items={navMainItems} activePath={""} />
+        <NavDocuments items={navDocumentsItems} />
+        <NavSecondary items={navSecondaryItems} className="mt-auto" />
       </SidebarContent>
 
       <SidebarFooter>
@@ -65,7 +69,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             id: user.id,
             name: user.name,
             email: user.email,
-            avatar: "/avatars/shadcn.jpg",
+            avatar: "/avatars/shadcn.jpg", 
           }}
         />
       </SidebarFooter>

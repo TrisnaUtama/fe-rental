@@ -2,7 +2,7 @@ import { Breadcrumbs } from "@/shared/components/Breadcrumbs";
 import CreateVehicleForm from "../components/CreateForm";
 import { CarFrontIcon, Pencil } from "lucide-react";
 
-export default function CreatePage() {
+export default function CreatePromoPageCreatePage() {
   return (
     <div className="space-y-4 mx-40">
       <Breadcrumbs

@@ -10,6 +10,7 @@ import CustomerLayout from "./shared/components/layout/customer/sidebar/customer
 import { customerRoute, pageRoutes } from "./shared/routes/pages.route";
 import { routeConfigs } from "./shared/routes/sidebar.route";
 import { CartProvider } from "./shared/context/cartContext";
+import type { Roles } from "./shared/enum/enum";
 
 // Lazy-loaded components...
 const SignUpStaff = lazy(() => import("./features/auth/pages/SignUpPage"));
@@ -45,6 +46,7 @@ export default function App() {
               {/* Auth and other public routes (No changes needed here) */}
               <Route path="/" element={<SignInStaff />} />
               <Route path="/sign-up" element={<SignUpStaff />} />
+              <Route path="/verified" element={<Verified />} />
               <Route path="/staff/verified" element={<Verified />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
               <Route path="*" element={<NotFound />} />
@@ -57,9 +59,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               >
-                {/* --- THIS IS THE CORRECTED ROUTING LOGIC --- */}
                 {routeConfigs.flatMap((route) => {
-                  // If the route has sub-items, map over them to create routes
                   if (route.subItems) {
                     return route.subItems.map((subItem) => {
                       const SubComponent = subItem.component;
@@ -95,13 +95,12 @@ export default function App() {
                   return null;
                 })}
 
-                {/* Non-sidebar pages (No changes needed here) */}
                 {pageRoutes.map(({ path, element: Component, roles }) => (
                   <Route
                     key={path}
                     path={path}
                     element={
-                      <ProtectedRoute allowedRoles={roles}>
+                      <ProtectedRoute allowedRoles={roles as Roles[]}>
                         <Component />
                       </ProtectedRoute>
                     }
@@ -115,7 +114,7 @@ export default function App() {
                   key={path}
                   path={path}
                   element={
-                    <ProtectedRoute allowedRoles={roles}>
+                    <ProtectedRoute allowedRoles={roles as Roles[]}>
                       <Component />
                     </ProtectedRoute>
                   }

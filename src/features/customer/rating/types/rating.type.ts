@@ -1,3 +1,5 @@
+import type { IUser } from "@/features/auth/types/auth.type";
+
 export type RatedEntityType =
   | "DESTINATION"
   | "VEHICLE"
@@ -14,6 +16,7 @@ export interface IRating {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  user: IUser
 }
 
 export interface ICreateRatingPayload {

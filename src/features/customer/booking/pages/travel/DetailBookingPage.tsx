@@ -17,71 +17,83 @@ export default function DetailBookingPage() {
     isLoading,
     error: bookingError,
   } = useAllBookingById(id ?? "", accessToken ?? "");
-
   const { mutateAsync: updatePayment } = useUpdatePayment(accessToken ?? "");
-
   const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
-
   const handleBack = () => navigate(-1);
 
+  const openSnapPopup = (snapToken: string) => {
+    if (window.snap) {
+      window.snap.pay(snapToken, {
+        onSuccess: (result: any) => {
+          toast.success(`Payment Success !`, {
+            description: `${result}`,
+          });
+        },
+        onPending: (result: any) => {
+          toast.warning(`Waiting for payment.`, {
+            description: `${result}`,
+          });
+        },
+        onError: (error: any) => {
+          toast.error(`Pembayaran gagal. Silakan coba lagi.`, {
+            description: `${error}`,
+          });
+        },
+        onClose: () => {
+          toast.info("Anda menutup pop-up pembayaran.");
+        },
+      });
+    } else {
+      toast.error("Midtrans script not loaded. Please refresh the page.");
+    }
+  };
+
   const handlePayment = async () => {
-    if (!id || !accessToken) {
-      toast.error("Invalid booking or user session. Please login again.");
+    if (!bookingData?.data) {
+      toast.error("Booking data is not available.");
       return;
     }
 
+    const paymentInfo = bookingData.data.Payments![0];
+    if (!paymentInfo) {
+      toast.error("Payment information not found for this booking.");
+      return;
+    }
     if (!clientKey) {
       toast.error("Payment gateway client key is missing. Contact support.");
       return;
     }
-
     try {
-      const response = await updatePayment({
-        id,
-      });
+      const existingToken = paymentInfo.token;
+      const tokenExpiry = paymentInfo.expiry_date
+        ? new Date(paymentInfo.expiry_date)
+        : null;
 
-      const snapToken = response.data.token;
-
-      if (!snapToken) {
-        throw new Error("Snap token is not available.");
+      if (existingToken && tokenExpiry && tokenExpiry > new Date()) {
+        openSnapPopup(existingToken);
+        return;
       }
-
-      if (window.snap) {
-        window.snap.pay(snapToken, {
-          onSuccess: (result) => {
-            toast.success(`Pembayaran berhasil!, ${result}`);
-            navigate("/payment/finish");
-          },
-          onPending: (result) => {
-            toast.warning(`Pembayaran tertunda. ${result}`);
-            navigate("/payment/unfinish");
-          },
-          onError: (error) => {
-            toast.error(`Terjadi kesalahan dalam proses pembayaran. ${error}`);
-            navigate("/payment/error");
-          },
-          onClose: () => {
-            toast.warning("Popup pembayaran ditutup tanpa konfirmasi.");
-            navigate("/payment/unfinish");
-          },
-        });
-      } else {
-        throw new Error("Midtrans Snap script is not loaded.");
+      const response = await updatePayment({ id: id! });
+      const newSnapToken = response.data.token;
+      if (!newSnapToken) {
+        throw new Error("Failed to retrieve Snap token from the server.");
       }
+      openSnapPopup(newSnapToken);
     } catch (error: any) {
-      toast.error(
-        error?.message || "Terjadi kesalahan saat proses pembayaran."
-      );
-      console.error("Payment processing error:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Error while processing payment.";
+      toast.error(errorMessage);
     }
   };
 
   if (isLoading) return <LoadingSpinner />;
   if (bookingError) {
-    toast.error("Gagal memuat data booking. Silakan coba lagi.");
+    toast.error("Try again.");
+    return <LoadingSpinner />;
   }
-
-  if (!bookingData?.data) return <div>Data booking tidak ditemukan.</div>;
+  if (!bookingData?.data) return <LoadingSpinner />;
 
   return (
     <>

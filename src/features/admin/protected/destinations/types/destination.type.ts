@@ -11,7 +11,7 @@ export interface IDestination {
   facilities: string[];
   status?: boolean;
   deleted_at?: Date | null;
-  travel_package_destinations: ITravelPackageDestination[]
+  travel_package_destinations?: ITravelPackageDestination[]
 }
 
 export interface ICreateDestination {

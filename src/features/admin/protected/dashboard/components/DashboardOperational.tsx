@@ -1,12 +1,8 @@
-import { ChartAreaInteractive } from "@/shared/components/layout/admin/sidebar/chart-area-interactive";
-import { SectionCards } from "@/shared/components/layout/admin/sidebar/section-card";
+import AdminOperationalDashboard from "@/shared/components/layout/admin/report/operational";
 export default function DashboardOperational() {
   return (
     <div className="space-y-6">
-      <SectionCards />
-      <div className="px-4 lg:px-6">
-        <ChartAreaInteractive />
-      </div>
+      <AdminOperationalDashboard />
     </div>
   );
 }

@@ -38,6 +38,7 @@ import {
   ChevronsRightIcon,
   ColumnsIcon,
   PlusIcon,
+  UploadIcon, // <-- 1. IMPORT IKON BARU
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DraggableRow } from "@/shared/components/table/dragAbleRow";
@@ -64,8 +65,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { Input } from "@/shared/components/ui/input"; 
+import { Input } from "@/shared/components/ui/input";
 
+// <-- 2. MODIFIKASI INTERFACE PROPS
 interface DataTableProps<T> {
   data: T[];
   path: string;
@@ -79,9 +81,11 @@ interface DataTableProps<T> {
   customizeColumnsLabel?: string;
   addSectionLabel?: string;
   tabs?: { value: string; label: string; content: React.ReactNode }[];
-  // --- NEW PROPS ---
   hideAddButton?: boolean;
   customFilters?: React.ReactNode;
+  addManyButton?: boolean;
+  onAddManyClick?: () => void; // Prop baru untuk menangani klik
+  addManyLabel?: string; // Prop baru untuk label tombol
 }
 
 export function DataTable<T extends object>({
@@ -92,7 +96,6 @@ export function DataTable<T extends object>({
   initialPageSize = 10,
   pageSizeOptions = [10, 20, 30, 40, 50],
   onDragEnd,
-  onAddSectionClick,
   noDataMessage = "No results.",
   customizeColumnsLabel = "Customize Columns",
   addSectionLabel,
@@ -103,9 +106,12 @@ export function DataTable<T extends object>({
       content: null,
     },
   ],
-  // --- Initialize new props ---
   hideAddButton = false,
   customFilters,
+  // <-- 3. DESTRUCTURE PROPS BARU
+  addManyButton = false,
+  onAddManyClick,
+  addManyLabel = "Add Many",
 }: DataTableProps<T>) {
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
@@ -180,9 +186,9 @@ export function DataTable<T extends object>({
         if (!searchTerm) return otherFilters;
         return [...otherFilters, { id: "name", value: searchTerm }];
       });
-    }, 300); // debounce
+    }, 300);
     return () => clearTimeout(timeout);
-  }, [searchTerm]);
+  }, [searchTerm, table]);
 
   return (
     <Tabs
@@ -190,29 +196,25 @@ export function DataTable<T extends object>({
       className="flex w-full flex-col justify-start gap-6"
     >
       <div className="flex flex-wrap items-center justify-between gap-4 px-4 lg:px-6">
-        {/* --- Toolbar: Search and Custom Filters --- */}
         <div className="flex flex-wrap items-center gap-4">
-            <Input
+          <Input
             placeholder="Search by name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full max-w-xs"
-            />
-            {/* --- Slot for custom filters --- */}
-            {customFilters}
+          />
+          {customFilters}
         </div>
-
-        {/* --- Toolbar: Column Visibility and Add Button --- */}
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <ColumnsIcon />
+              <Button variant="outline" size="sm" className="gap-2">
+                <ColumnsIcon className="h-4 w-4" />
                 <span className="hidden lg:inline">
                   {customizeColumnsLabel}
                 </span>
                 <span className="lg:hidden">Columns</span>
-                <ChevronDownIcon />
+                <ChevronDownIcon className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
@@ -237,17 +239,25 @@ export function DataTable<T extends object>({
                 ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          
-          {/* --- Conditionally render the "Add" button --- */}
-          {!hideAddButton && (
-            <Button variant="outline" size="sm" onClick={onAddSectionClick}>
-                <PlusIcon />
-                <Link to={path} className="hidden lg:inline">
-                {addSectionLabel}
-                </Link>
+
+          {/* --- 4. LOGIKA TOMBOL DIPERBARUI --- */}
+          {/* Tombol untuk "Add Single" */}
+          {!hideAddButton && addSectionLabel && (
+            <Button variant="outline" size="sm" asChild>
+              <Link to={path} className="flex items-center gap-2">
+                <PlusIcon className="h-4 w-4" />
+                <span className="hidden lg:inline">{addSectionLabel}</span>
+              </Link>
             </Button>
           )}
 
+          {/* Tombol untuk "Add Many" */}
+          {addManyButton && (
+            <Button variant="default" size="sm" onClick={onAddManyClick} className="flex items-center gap-2">
+              <UploadIcon className="h-4 w-4" />
+              <span className="hidden lg:inline">{addManyLabel}</span>
+            </Button>
+          )}
         </div>
       </div>
       {tabs.map(({ value, content }) => (
@@ -286,7 +296,7 @@ export function DataTable<T extends object>({
                         </TableRow>
                       ))}
                     </TableHeader>
-                    <TableBody className="**:data-[slot=table-cell]:first:w-8">
+                    <TableBody>
                       <SortableContext
                         items={dataIds}
                         strategy={verticalListSortingStrategy}

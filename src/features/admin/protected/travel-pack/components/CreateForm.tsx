@@ -204,7 +204,6 @@ export default function CreateForm() {
           (item) => item.day_number >= 1
         ),
       };
-      console.log(submissionPayload);
       const data = await createTravelPackAsync(submissionPayload);
       if (data.success) {
         toast.success("Success", {
@@ -220,7 +219,6 @@ export default function CreateForm() {
       }
     } catch (err: any) {
       if (err?.errors && typeof err.errors === "object") {
-        console.log(err.error);
         setFieldErrors((prev: any) => ({
           ...prev,
           ...err.errors,

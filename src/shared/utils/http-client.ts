@@ -1,4 +1,3 @@
-// http-client/httpRequest.ts
 import { HttpError } from "./http-error";
 
 export async function httpRequest<T>(
@@ -39,20 +38,16 @@ export async function httpRequest<T>(
     } else if (contentType.startsWith("text/")) {
       result = await res.text();
     } else {
-      result = await res.blob(); // Fallback for other content types
+      result = await res.blob();
     }
   } catch (parseError) {
-    // If res.json() fails, it means the body wasn't valid JSON.
-    // Try to read it as plain text to get *something*.
     let rawText = '';
     try {
-        rawText = await res.text(); // Attempt to read as text if JSON parsing fails
+        rawText = await res.text(); 
     } catch (textError) {
-        // Can't even read as text, very unusual
     }
-    console.error("Failed to parse response body as JSON.", parseError, "Raw response text:", rawText);
     throw new HttpError(
-      `Invalid response format or malformed JSON. Raw: ${rawText.substring(0, 100)}...`, // Include raw text for debugging
+      `Invalid response format or malformed JSON. Raw: ${rawText.substring(0, 100)}...`,
       res.status
     );
   }
@@ -61,14 +56,12 @@ export async function httpRequest<T>(
     let errorMessage = "Request failed";
     let validationErrors: Record<string, string[]> | undefined;
 
-    // Standardize error message and extract validation errors
     if (typeof result === "object") {
-        // Elysia's default validation error structure
         if (result.errors && Array.isArray(result.errors)) {
             errorMessage = "Validation Error";
             validationErrors = {};
             result.errors.forEach((err: any) => {
-                const path = err.path ? err.path.replace('/body/', '') : 'general'; // Remove '/body/' prefix
+                const path = err.path ? err.path.replace('/body/', '') : 'general'; 
                 if (path) {
                     if (!validationErrors![path]) {
                         validationErrors![path] = [];
@@ -77,17 +70,13 @@ export async function httpRequest<T>(
                 }
             });
         } else if (result.message) {
-            // Your StandardResponse.error format
             errorMessage = result.message;
-            if (result.errors) { // If StandardResponse.error includes an 'errors' field
+            if (result.errors) { 
                 validationErrors = result.errors;
             }
         }
-        // Fallback if result is an object but doesn't fit known error structures
-        // You might log `result` directly here for debugging
-        console.error("Unknown error object structure:", result);
     } else if (typeof result === 'string' && result.length > 0) {
-        errorMessage = result; // If the response was a plain error string
+        errorMessage = result; 
     }
 
     throw new HttpError(errorMessage, res.status, validationErrors);

@@ -22,11 +22,10 @@ import type { IResponseGlobal } from "@/shared/types/standard-response";
 
 type RatingQueryOptions<T> = Omit<UseQueryOptions<T, Error>, 'queryKey' | 'queryFn'>;
 
-export function useAllRating(token: string) {
+export function useAllRating() {
   return useQuery<IResponseGlobal<IRating[]>, Error>({
     queryKey: ["rating"],
-    queryFn: () => GetAllRating(token),
-    enabled: !!token,
+    queryFn: () => GetAllRating(),
   });
 }
 

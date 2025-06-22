@@ -1,9 +1,9 @@
-import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
-import { Calendar, Eye, Map } from "lucide-react";
+import { Calendar, Clock, ArrowRight } from "lucide-react";
 import { StatusBadge } from "../../vehicle/list/StatusBadge";
 import type { BookingResponse, BookingStatus } from "../../../types/booking.type";
 import { format } from "date-fns";
+import { motion, type Variants } from "framer-motion"; 
 
 const formatRupiah = (value: string | number) =>
   new Intl.NumberFormat("id-ID", {
@@ -18,7 +18,7 @@ interface BookingCardTravelProps {
 }
 
 export function BookingCardTravel({ booking, onViewDetails }: BookingCardTravelProps) {
-  const { travel_package: travelPackage, status, start_date, total_price,  } = booking;
+  const { travel_package: travelPackage, status, start_date, total_price } = booking;
 
   if (!travelPackage) {
     return (
@@ -28,55 +28,70 @@ export function BookingCardTravel({ booking, onViewDetails }: BookingCardTravelP
     );
   }
 
+  const cardVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.4, ease: "easeOut" }
+    },
+  };
+
   return (
-    <Card className="w-full bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 group overflow-hidden">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-4">
+    <motion.div
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      className="group"
+    >
+      <Card 
+        className="w-full bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer"
+        onClick={() => onViewDetails(booking.id)}
+      >
+        <div className="relative h-48 overflow-hidden">
           <img
             src={travelPackage.image}
             alt={travelPackage.name}
-            className="w-24 h-24 object-cover rounded-lg flex-shrink-0 bg-gray-100"
+            className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
           />
-          <div className="flex-1 min-w-0">
-            <div className="flex justify-between items-start mb-2">
-              <p className="text-xs font-semibold text-blue-600 uppercase">
-                TRAVEL PACKAGE
-              </p>
-              <StatusBadge status={status as BookingStatus} />
-            </div>
-            <h3 className="font-bold text-gray-900 text-lg truncate group-hover:text-blue-600">
+          <div className="absolute top-0 right-0 p-3">
+            <StatusBadge status={status as BookingStatus} />
+          </div>
+          <div className="absolute bottom-0 h-1/4 w-full bg-gradient-to-t from-black/20 to-transparent"></div>
+        </div>
+
+        <CardContent className="p-4 space-y-4">
+          <div>
+            <h3 className="font-bold text-gray-900 text-xl leading-tight truncate">
               {travelPackage.name}
             </h3>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 mt-2">
+            <div className="flex items-center gap-4 text-xs text-gray-500 mt-2">
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
-                {format(new Date(start_date), "dd MMM yyyy")}
+                {format(new Date(start_date), "dd MMMM, yyyy")}
               </span>
               <span className="flex items-center gap-1.5">
-                <Map className="w-3.5 h-3.5" />
+                <Clock className="w-3.5 h-3.5" />
                 {travelPackage.duration} Days
               </span>
             </div>
           </div>
-        </div>
-        <div className="flex items-center justify-between pt-4 mt-4 border-t">
-          <div>
-            <p className="text-lg font-bold text-gray-800">
-              {formatRupiah(total_price!)}
-            </p>
-            <p className="text-xs text-gray-500">Total Price</p>
+          
+          <div className="flex items-end justify-between pt-4 border-t">
+            <div>
+              <p className="text-xs text-gray-500">Total Price</p>
+              <p className="text-2xl font-bold text-gray-800">
+                  {formatRupiah(total_price!)}
+              </p>
+            </div>
+            <div className="flex items-center gap-1 text-sm font-semibold text-blue-600">
+              Details
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onViewDetails(booking.id)}
-            className="gap-2"
-          >
-            <Eye className="w-4 h-4" />
-            View Details
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

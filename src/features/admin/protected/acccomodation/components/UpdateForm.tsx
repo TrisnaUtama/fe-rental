@@ -129,9 +129,9 @@ export default function UpdateAccomodationForm() {
       for (const filename of imageToDelete) {
         const deleted = await deleteImageAsync(filename);
         if (!deleted.success) {
-          console.error(`Failed to delete: ${filename}`, deleted.message);
+          throw new Error(`Failed to delete: ${filename} ${deleted.message}`);
         } else {
-          console.log(`Deleted: ${filename}`);
+          throw new Error(`Deleted: ${filename}`);
         }
       }
 
@@ -307,10 +307,10 @@ export default function UpdateAccomodationForm() {
             <div className="p-2 bg-black text-white rounded-lg">
               <MapPin className="h-6 w-6" />
             </div>
-            Create New Destination
+            Update Destination
           </CardTitle>
           <CardDescription className="text-base">
-            Add a new destination to your fleet with detailed specifications and
+           Update destination to your fleet with detailed specifications and
             images
           </CardDescription>
         </CardHeader>

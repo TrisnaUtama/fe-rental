@@ -4,7 +4,7 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from "@tanstack/react-query";
-import { assignVehicleAndConfirmBooking, FindBookingById, GetAllBookings, UpdateBooking } from "../services/booking.service";
+import { assignVehicleAndConfirmBooking, FindBookingById, GetAllBookings, GetFullyBookedDatesForVehicles, UpdateBooking } from "../services/booking.service";
 import type { AssignVehiclePayload, BookingResponse, UpdateBookingPayload } from "../types/booking.type";
 import type { IResponseGlobal } from "@/shared/types/standard-response";
 
@@ -13,6 +13,14 @@ export function useAllBooking(token:string) {
     queryKey: ["booking"],
     queryFn: () => GetAllBookings(token),
      enabled: !!token,
+  });
+}
+
+export function useGetFullyBookedDates(vehicleIds: string[]) {
+  return useQuery<IResponseGlobal<string[]>, Error>({
+    queryKey: ['fullyBookedDates', vehicleIds],
+    queryFn: () => GetFullyBookedDatesForVehicles(vehicleIds),
+    enabled: !!vehicleIds && vehicleIds.length > 0, 
   });
 }
 

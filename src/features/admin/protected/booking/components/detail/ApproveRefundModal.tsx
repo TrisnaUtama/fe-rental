@@ -59,8 +59,7 @@ export function ApproveRefundModal({
         transfer_proof: imageUrl,
       });
     } catch (error) {
-      toast.error("Failed to upload proof. Please try again.");
-      console.error(error);
+      toast.error(`Failed to upload proof. Please try again. ${error}`);
     }
   };
 

@@ -1,7 +1,7 @@
-import { useAllBooking } from "../../../hooks/useBooking"; // Assuming this path is correct
-import { DataTable } from "@/shared/components/table/table"; // Assuming this path is correct
-import { bookingColumns } from "./table/column"; // Assuming this path is correct
-import type { BookingResponse } from "../../../types/booking.type"; // Assuming this path is correct
+import { useAllBooking } from "../../../hooks/useBooking"; 
+import { DataTable } from "@/shared/components/table/table";
+import { bookingColumns } from "./table/column";
+import type { BookingResponse } from "../../../types/booking.type"; 
 import LoadingSpinner from "@/features/redirect/pages/Loading";
 import { useAuthContext } from "@/shared/context/authContex";
 
@@ -22,8 +22,7 @@ export default function Index() {
 
       return bookingEndDate >= today;
     } catch (e) {
-      console.error(`Invalid start_date for booking ID: ${booking.id || 'N/A'}, start_date: ${booking.start_date}`, e);
-      return false; 
+      throw new Error(`Invalid start_date for booking ID: ${booking.id || 'N/A'}, start_date: ${booking.start_date} || ${e}`);
     }
   }) || []; 
 

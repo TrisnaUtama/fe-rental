@@ -311,14 +311,10 @@ export default function UpdateForm() {
     form.travel_package_destinations = existingDest as [
       { id: ""; destination_id: "" }
     ];
-    form.new_travel_destination?.forEach((it, i) => {
-      console.log(`New Destination ${i}:`, it.destination_id);
-    });
 
     const validate = validateForm();
     if (!validate) {
-      console.log("Validation failed with errors:", fieldErrors);
-      return;
+      throw new Error(`Validation failed with errors: ${fieldErrors}`, );
     }
 
     try {
@@ -331,7 +327,7 @@ export default function UpdateForm() {
           try {
             await deleteImageAsync(currentImageFilename!);
           } catch (deleteError) {
-            console.warn("Failed to delete old image:", deleteError);
+            throw new Error(`Failed to delete old image: ${deleteError}`, );
           }
         }
 
@@ -384,9 +380,7 @@ export default function UpdateForm() {
               new_travel_destination: newDest!,
             });
           } catch (destError) {
-            console.error("Failed to add new destinations:", destError);
-            console.error("Destination error details:", destError || "");
-            throw destError;
+            throw new Error(`Failed to update destination: ${destError}`);
           }
         }
 
@@ -403,10 +397,6 @@ export default function UpdateForm() {
         });
       }
     } catch (err: any) {
-      console.error("Submit error:", err);
-      console.error("Error message:", err.message);
-      console.error("Error response:", err.response?.data);
-
       if (err?.errors && typeof err.errors === "object") {
         setFieldErrors((prev: any) => ({
           ...prev,
@@ -516,10 +506,10 @@ export default function UpdateForm() {
               <div className="p-2 bg-black text-white rounded-lg">
                 <PlaneIcon className="h-6 w-6" />
               </div>
-              Create New Travel Package
+              Update Travel Package
             </CardTitle>
             <CardDescription className="text-base">
-              Add a new travel package to your fleet with detailed
+              Update travel package to your fleet with detailed
               specifications and images
             </CardDescription>
           </CardHeader>
