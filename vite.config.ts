@@ -11,4 +11,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    host: true,
+    allowedHosts: ["fe.trisnautama.site"],
+    watch: {
+      usePolling: true,
+    },
+  },
 })
