@@ -28,6 +28,11 @@ export default function DetailBookingPage() {
           toast.success(`Payment Success !`, {
             description: `${result}`,
           });
+          navigate(`/payment/finish`, { 
+            state: { 
+              transactionResult: result 
+            }
+          });
         },
         onPending: (result: any) => {
           toast.warning(`Waiting for payment.`, {
