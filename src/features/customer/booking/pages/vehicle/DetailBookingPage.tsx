@@ -1,3 +1,5 @@
+// src/pages/DetailBookingPage.tsx
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useAllBookingById } from "../../hooks/useBooking";
 import LoadingSpinner from "@/features/redirect/pages/Loading";
@@ -25,27 +27,23 @@ export default function DetailBookingPage() {
     if (window.snap) {
       window.snap.pay(snapToken, {
         onSuccess: (result: any) => {
-          toast.success(`Payment Success !`, {
-            description: `${result}`,
-          });
-          navigate(`/payment/finish`, { 
-            state: { 
-              transactionResult: result 
-            }
+          toast.success(`Payment Success!`);
+          navigate('/payment/finish', { 
+            state: { transactionResult: result } 
           });
         },
         onPending: (result: any) => {
-          toast.warning(`Waiting for payment.`, {
-            description: `${result}`,
+          toast.warning(`Waiting for payment.`);
+          navigate('/payment/pending', {
+            state: { transactionResult: result }
           });
         },
-        onError: (error: any) => {
-          toast.error(`Pembayaran gagal. Silakan coba lagi.`, {
-            description: `${error}`,
-          });
+        onError: () => {
+          toast.error(`Payment failed. Please try again.`);
+          navigate('/payment/error');
         },
         onClose: () => {
-          toast.info("Anda menutup pop-up pembayaran.");
+          toast.info("You closed the payment pop-up.");
         },
       });
     } else {
@@ -95,10 +93,10 @@ export default function DetailBookingPage() {
 
   if (isLoading) return <LoadingSpinner />;
   if (bookingError) {
-    toast.error("Try again.");
-    return <LoadingSpinner />;
+    toast.error("Failed to load booking details.");
+    return <LoadingSpinner />; // Or a better error component
   }
-  if (!bookingData?.data) return <LoadingSpinner />;
+  if (!bookingData?.data) return <LoadingSpinner />; // Or a "Not Found" component
 
   return (
     <>

@@ -11,18 +11,35 @@ import { customerRoute, pageRoutes } from "./shared/routes/pages.route";
 import { routeConfigs } from "./shared/routes/sidebar.route";
 import { CartProvider } from "./shared/context/cartContext";
 import type { Roles } from "./shared/enum/enum";
+import PaymentFinish from "./features/redirect/pages/finishPayment";
+import PaymentError from "./features/redirect/pages/errorPayment";
+import PaymentUnfinished from "./features/redirect/pages/unfinishPayment";
 
 // Lazy-loaded components...
 const SignUpStaff = lazy(() => import("./features/auth/pages/SignUpPage"));
 const SignInStaff = lazy(() => import("./features/auth/pages/SignInPage"));
 const Verified = lazy(() => import("./features/otp/pages/page"));
-const LandingPage = lazy(() => import("./features/customer/landing/pages/LandingPage"));
-const CatalogVehicle = lazy(() => import("./features/customer/vehicle/pages/CatalogPage"));
-const CatalogTravelPack = lazy(() => import("./features/customer/travelpackage/pages/CatalogPage"));
-const CatalogDestination = lazy(() => import("./features/customer/destination/pages/CatalogPage"));
-const DetailTravelPack = lazy(() => import("./features/customer/travelpackage/pages/DetailPage"));
-const DetailDestination = lazy(() => import("./features/customer/destination/pages/DetailPage"));
-const Unauthorized = lazy(() => import("./features/redirect/pages/Unauthorized"));
+const LandingPage = lazy(
+  () => import("./features/customer/landing/pages/LandingPage")
+);
+const CatalogVehicle = lazy(
+  () => import("./features/customer/vehicle/pages/CatalogPage")
+);
+const CatalogTravelPack = lazy(
+  () => import("./features/customer/travelpackage/pages/CatalogPage")
+);
+const CatalogDestination = lazy(
+  () => import("./features/customer/destination/pages/CatalogPage")
+);
+const DetailTravelPack = lazy(
+  () => import("./features/customer/travelpackage/pages/DetailPage")
+);
+const DetailDestination = lazy(
+  () => import("./features/customer/destination/pages/DetailPage")
+);
+const Unauthorized = lazy(
+  () => import("./features/redirect/pages/Unauthorized")
+);
 const NotFound = lazy(() => import("./features/redirect/pages/NotFound"));
 
 export default function App() {
@@ -34,12 +51,33 @@ export default function App() {
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
               {/* Customer Public Routes (No changes needed here) */}
-              <Route path="/car-rental" element={<CustomerLayout><LandingPage /></CustomerLayout>} />
+              <Route
+                path="/car-rental"
+                element={
+                  <CustomerLayout>
+                    <LandingPage />
+                  </CustomerLayout>
+                }
+              />
               <Route path="/rentals" element={<CatalogVehicle />} />
-              <Route path="/destination" element={<CustomerLayout><LandingPage /></CustomerLayout>} />
+              <Route
+                path="/destination"
+                element={
+                  <CustomerLayout>
+                    <LandingPage />
+                  </CustomerLayout>
+                }
+              />
               <Route path="/destinations" element={<CatalogDestination />} />
               <Route path="/destination/:id" element={<DetailDestination />} />
-              <Route path="/travel" element={<CustomerLayout><LandingPage /></CustomerLayout>} />
+              <Route
+                path="/travel"
+                element={
+                  <CustomerLayout>
+                    <LandingPage />
+                  </CustomerLayout>
+                }
+              />
               <Route path="/travels" element={<CatalogTravelPack />} />
               <Route path="/travel/:id" element={<DetailTravelPack />} />
 
@@ -49,6 +87,9 @@ export default function App() {
               <Route path="/verified" element={<Verified />} />
               <Route path="/staff/verified" element={<Verified />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
+              <Route path="/payment/finish" element={<PaymentFinish />} />
+              <Route path="/payment/error" element={<PaymentError />} />
+              <Route path="/payment/pending" element={<PaymentUnfinished />} />
               <Route path="*" element={<NotFound />} />
 
               {/* Protected Admin/Staff Routes */}
