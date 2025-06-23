@@ -1,5 +1,3 @@
-// src/pages/DetailBookingPage.tsx
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useAllBookingById } from "../../hooks/useBooking";
 import LoadingSpinner from "@/features/redirect/pages/Loading";
@@ -94,9 +92,9 @@ export default function DetailBookingPage() {
   if (isLoading) return <LoadingSpinner />;
   if (bookingError) {
     toast.error("Failed to load booking details.");
-    return <LoadingSpinner />; // Or a better error component
+    return <LoadingSpinner />; 
   }
-  if (!bookingData?.data) return <LoadingSpinner />; // Or a "Not Found" component
+  if (!bookingData?.data) return <LoadingSpinner />;
 
   return (
     <>

@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/shared/components/ui/button";
 import type { BookingStatus } from "../../../types/booking.type"; // Ensure this path is correct
 
