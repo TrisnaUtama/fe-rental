@@ -26,7 +26,7 @@ export default function DetailBookingPage() {
       window.snap.pay(snapToken, {
         onSuccess: (result: any) => {
           toast.success(`Payment Success!`);
-          navigate('/payment/finish', { 
+          navigate('/payment-vehicle-finish', { 
             state: { transactionResult: result } 
           });
         },

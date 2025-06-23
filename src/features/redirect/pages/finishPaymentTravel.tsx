@@ -20,7 +20,7 @@ const Spinner = () => (
   <div className="border-4 border-gray-200 border-t-blue-500 rounded-full w-8 h-8 animate-spin"></div>
 );
 
-export default function PaymentFinish() {
+export default function PaymentFinishTravel() {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(5);
 
@@ -30,7 +30,7 @@ export default function PaymentFinish() {
     }, 1000);
 
     const redirectTimeout = setTimeout(() => {
-      navigate(`/car-rental`);
+      navigate(`/list-booking-travel`);
     }, 3000);
 
     return () => {

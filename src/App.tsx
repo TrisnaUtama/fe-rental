@@ -11,9 +11,10 @@ import { customerRoute, pageRoutes } from "./shared/routes/pages.route";
 import { routeConfigs } from "./shared/routes/sidebar.route";
 import { CartProvider } from "./shared/context/cartContext";
 import type { Roles } from "./shared/enum/enum";
-import PaymentFinish from "./features/redirect/pages/finishPayment";
+import PaymentFinishVehicle from "./features/redirect/pages/finishPaymentVehicle";
 import PaymentError from "./features/redirect/pages/errorPayment";
 import PaymentUnfinished from "./features/redirect/pages/unfinishPayment";
+import PaymentFinishTravel from "./features/redirect/pages/finishPaymentTravel";
 
 // Lazy-loaded components...
 const SignUpStaff = lazy(() => import("./features/auth/pages/SignUpPage"));
@@ -87,7 +88,8 @@ export default function App() {
               <Route path="/verified" element={<Verified />} />
               <Route path="/staff/verified" element={<Verified />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
-              <Route path="/payment/finish" element={<PaymentFinish />} />
+              <Route path="/payment-vehicle-finish" element={<PaymentFinishVehicle />} />
+              <Route path="/payment-travel-finish" element={<PaymentFinishTravel />} />
               <Route path="/payment/error" element={<PaymentError />} />
               <Route path="/payment/pending" element={<PaymentUnfinished />} />
               <Route path="*" element={<NotFound />} />

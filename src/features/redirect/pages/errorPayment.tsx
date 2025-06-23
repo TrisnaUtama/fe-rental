@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 
-// Error icon component in SVG format for visual feedback
 const ErrorIcon = () => (
   <svg
     className="w-24 h-24 text-red-500 mx-auto"

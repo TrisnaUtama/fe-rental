@@ -14,9 +14,6 @@ import ListBookingVehicle from "@/features/customer/booking/pages/vehicle/ListBo
 import ListBookingTravel from "@/features/customer/booking/pages/travel/ListBooking";
 import DetailBookingVehiclePage from "@/features/customer/booking/pages/vehicle/DetailBookingPage";
 import DetailBookingTravelPage from "@/features/customer/booking/pages/travel/DetailBookingPage";
-import PaymentFinish from "@/features/redirect/pages/finishPayment";
-import PaymentError from "@/features/redirect/pages/errorPayment";
-import PaymentUnfinish from "@/features/redirect/pages/unfinishPayment";
 import BookingPageTravel from "@/features/customer/booking/pages/travel/BookingPage";
 import DetailBookingPage from "@/features/admin/protected/booking/pages/detailPage";
 import CreatePromoPage from "@/features/admin/protected/promo/pages/createPage";
@@ -43,7 +40,7 @@ export const pageRoutes = [
   {
     path: "/staff/data-promo/create",
     element: CreatePromoPage,
-    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE"]
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE"],
   },
   {
     path: "/staff/data-travel-pack/create",
@@ -83,17 +80,17 @@ export const pageRoutes = [
   {
     path: "/staff/detail-booking/:id",
     element: DetailBookingPage,
-    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE"]
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE"],
   },
   {
     path: "/staff/data-promo/update/:id",
     element: UpdatePromoPage,
-    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE"]
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE"],
   },
   {
     path: "/staff/profile",
     element: ProfileIndex,
-    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE"]
+    roles: ["SUPERADMIN", "ADMIN_OPERATIONAL", "ADMIN_FINANCE"],
   },
 ];
 
@@ -101,56 +98,41 @@ export const customerRoute = [
   {
     path: "/booking-vehicle",
     element: BookingPageVehicle,
-    roles: ["CUSTOMER"] ,
+    roles: ["CUSTOMER"],
   },
   {
     path: "/success-submit-booking",
     element: BookingSuccess,
-    roles: ["CUSTOMER"] ,
+    roles: ["CUSTOMER"],
   },
   {
     path: "/list-booking-vehicle",
     element: ListBookingVehicle,
-    roles: ["CUSTOMER"] ,
+    roles: ["CUSTOMER"],
   },
   {
     path: "/list-booking-travel",
     element: ListBookingTravel,
-    roles: ["CUSTOMER"] ,
+    roles: ["CUSTOMER"],
   },
   {
     path: "/detail-booking-vehicle/:id",
     element: DetailBookingVehiclePage,
-    roles: ["CUSTOMER"] ,
+    roles: ["CUSTOMER"],
   },
   {
     path: "/detail-booking-travel/:id",
     element: DetailBookingTravelPage,
-    roles: ["CUSTOMER"] ,
-  },
-  {
-    path: "/payment/finish",
-    element: PaymentFinish,
-    roles: ["CUSTOMER"] ,
-  },
-  {
-    path: "/payment/error",
-    element: PaymentError,
-    roles: ["CUSTOMER"] ,
-  },
-  {
-    path: "/payment/unfinish",
-    element: PaymentUnfinish,
-    roles: ["CUSTOMER"] ,
+    roles: ["CUSTOMER"],
   },
   {
     path: "/booking-travel-pack",
     element: BookingPageTravel,
-    roles: ["CUSTOMER"] ,
+    roles: ["CUSTOMER"],
   },
   {
     path: "/profile",
     element: ProfileIndexCustomer,
-    roles: ["CUSTOMER"] ,
+    roles: ["CUSTOMER"],
   },
 ];
