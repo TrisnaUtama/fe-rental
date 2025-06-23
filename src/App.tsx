@@ -81,7 +81,6 @@ export default function App() {
               <Route path="/travels" element={<CatalogTravelPack />} />
               <Route path="/travel/:id" element={<DetailTravelPack />} />
 
-              {/* Auth and other public routes (No changes needed here) */}
               <Route path="/" element={<SignInStaff />} />
               <Route path="/sign-up" element={<SignUpStaff />} />
               <Route path="/verified" element={<Verified />} />
@@ -92,7 +91,6 @@ export default function App() {
               <Route path="/payment/pending" element={<PaymentUnfinished />} />
               <Route path="*" element={<NotFound />} />
 
-              {/* Protected Admin/Staff Routes */}
               <Route
                 element={
                   <ProtectedRoute>

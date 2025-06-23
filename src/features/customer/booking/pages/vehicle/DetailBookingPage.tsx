@@ -19,7 +19,7 @@ export default function DetailBookingPage() {
   } = useAllBookingById(id ?? "", accessToken ?? "");
   const { mutateAsync: updatePayment } = useUpdatePayment(accessToken ?? "");
   const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
-  const handleBack = () => navigate(-1);
+  const handleBack = () => navigate("/list-booking-vehicle");;
 
   const openSnapPopup = (snapToken: string) => {
     if (window.snap) {

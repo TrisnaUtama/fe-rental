@@ -59,7 +59,6 @@ export const InvoiceReceiptTravel = ({ booking }: { booking: BookingResponse }) 
                     </div>
                 </div>
 
-                {/* --- BILLED TO & PAYMENT DETAILS SECTION --- */}
                 <div className="grid grid-cols-2 gap-8 py-6">
                     <div>
                         <p className="text-sm text-gray-500 font-semibold mb-2">BILLED TO</p>
@@ -82,8 +81,8 @@ export const InvoiceReceiptTravel = ({ booking }: { booking: BookingResponse }) 
                 </div>
                 
                 <div className="border-t border-b py-4 my-4">
-                     <h4 className="text-sm font-semibold text-gray-500 mb-3">BOOKING DETAILS</h4>
-                     <div className="grid grid-cols-2 gap-4">
+                    <h4 className="text-sm font-semibold text-gray-500 mb-3">BOOKING DETAILS</h4>
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4 text-blue-500"/>
                             <div>
@@ -93,12 +92,12 @@ export const InvoiceReceiptTravel = ({ booking }: { booking: BookingResponse }) 
                         </div>
                         <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4 text-blue-500"/>
-                             <div>
+                            <div>
                                 <p className="text-xs text-gray-500">Return</p>
                                 <p className="font-medium text-gray-800">{format(new Date(booking.end_date!), "dd MMMM yyyy")}</p>
                             </div>
                         </div>
-                     </div>
+                    </div>
                 </div>
 
                 <div>
