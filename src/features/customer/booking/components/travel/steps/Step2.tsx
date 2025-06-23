@@ -214,7 +214,7 @@ export function Step2_TravelPackReview() {
     }
   };
 
-  const endDate = addDays(departureDate, travelPack.duration);
+  const endDate = addDays(departureDate, travelPack.duration - 1);
 
   const groupedItinerary = useMemo(() => {
     if (!travelPack?.travel_itineraries) return {};
@@ -335,7 +335,6 @@ export function Step2_TravelPackReview() {
                 </CardContent>
             </Card>
 
-            {/* MOVED: PROMOTIONS AND NOTES ARE NOW IN THE MAIN COLUMN */}
             <Card className="rounded-xl shadow-md">
                 <CardHeader className="border-b">
                     <CardTitle className="flex items-center gap-3">
