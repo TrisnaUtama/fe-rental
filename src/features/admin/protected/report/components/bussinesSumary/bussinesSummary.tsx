@@ -313,8 +313,8 @@ export default function OverallBusinessSummaryReport() {
                 )}</p>
               </div>
               <div class="text-right">
-                <h2 class="text-lg font-semibold text-gray-800">Your Company Name</h2>
-                <p class="text-xs text-gray-500">Jl. Jenderal Sudirman No. 123, Jakarta</p>
+                <h2 class="text-lg font-semibold text-gray-800">XYZ</h2>
+                <p class="text-xs text-gray-500">Jl. XYZ</p>
               </div>
             </header>
             <section class="my-6">

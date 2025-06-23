@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const CheckIcon = () => (
   <svg
@@ -20,24 +20,36 @@ const Spinner = () => (
   <div className="border-4 border-gray-200 border-t-blue-500 rounded-full w-8 h-8 animate-spin"></div>
 );
 
-export default function PaymentFinishTravel() {
+interface LocationState {
+  bookingId: string;
+  bookingType: "vehicle" | "travel";
+}
+
+export default function PaymentFinishPage() {
   const navigate = useNavigate();
-  const [countdown, setCountdown] = useState(5);
+  const location = useLocation();
+  const { bookingId, bookingType } = location.state as LocationState;
+
+  const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCountdown((prevCountdown) => prevCountdown - 1);
+      setCountdown((prev) => prev - 1);
     }, 1000);
 
-    const redirectTimeout = setTimeout(() => {
-      navigate(`/list-booking-travel`);
+    const redirect = setTimeout(() => {
+      if (bookingType === "vehicle") {
+        navigate(`/detail-booking-vehicle/${bookingId}`);
+      } else {
+        navigate(`/detail-booking-travel/${bookingId}`);
+      }
     }, 3000);
 
     return () => {
       clearInterval(timer);
-      clearTimeout(redirectTimeout);
+      clearTimeout(redirect);
     };
-  }, [navigate]);
+  }, [navigate, bookingId, bookingType]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4 text-center">

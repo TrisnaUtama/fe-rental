@@ -26,8 +26,12 @@ export default function DetailBookingPage() {
       window.snap.pay(snapToken, {
         onSuccess: (result: any) => {
           toast.success(`Payment Success!`);
-          navigate('/payment-travel-finish', { 
-            state: { transactionResult: result } 
+          navigate("/payment-finish", {
+            state: {
+              transactionResult: result,
+              bookingId: bookingData?.data.id,
+              bookingType: "travel", 
+            },
           });
         },
         onPending: (result: any) => {

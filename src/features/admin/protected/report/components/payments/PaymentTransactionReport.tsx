@@ -127,8 +127,8 @@ export default function PaymentTransactionReport() {
                         )}</p>
                     </div>
                     <div class="text-right">
-                        <h2 class="text-lg font-semibold text-gray-800">Your Company Name</h2>
-                        <p class="text-xs text-gray-500">Jl. Jenderal Sudirman No. 123, Jakarta</p>
+                        <h2 class="text-lg font-semibold text-gray-800">XYZ</h2>
+                        <p class="text-xs text-gray-500">Jl. XYZ</p>
                     </div>
                 </header>
                 <section class="grid grid-cols-3 gap-4 my-6">
@@ -155,7 +155,7 @@ export default function PaymentTransactionReport() {
                   tableRef.current.outerHTML
                 }</div></main>
                 <footer class="text-center text-xs text-gray-400 mt-8 pt-4 border-t">
-                    <p>Confidential &copy; ${new Date().getFullYear()} Your Company Name</p>
+                    <p>Confidential &copy; ${new Date().getFullYear()} XYZ</p>
                 </footer>
             </div>
         </body>

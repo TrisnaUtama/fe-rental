@@ -1,14 +1,14 @@
 import { useState, useRef, useMemo } from "react";
-import { Printer, X, AlertCircle, Plane, DollarSign, Hash } from "lucide-react"; // Added Plane, DollarSign, Hash
-import { useTravelPackagePopularityReport } from "../../hooks/useReport"; // Make sure path is correct
+import { Printer, X, AlertCircle, Plane, DollarSign, Hash } from "lucide-react"; 
+import { useTravelPackagePopularityReport } from "../../hooks/useReport"; 
 import type {
   DateRange,
   ITravelPackagePopularityReport,
-} from "../../types/report"; // Make sure path is correct
-import { DataTable, type Column } from "../reports/DataTable"; // Assuming these are components
-import { StatCard } from "../reports/StatCard"; // Assuming this is a component
-import { Card } from "../ui/Card"; // Assuming this is a component
-import { EnhancedDatePicker } from "../ui/EnchantedDatePicker"; // Assuming this is a component
+} from "../../types/report";
+import { DataTable, type Column } from "../reports/DataTable"; 
+import { StatCard } from "../reports/StatCard";
+import { Card } from "../ui/Card"; 
+import { EnhancedDatePicker } from "../ui/EnchantedDatePicker"; 
 
 interface ITravelPackagePopularityItem {
   id: string;
@@ -219,8 +219,8 @@ export default function TravelPackagePopularityReport() {
               )}</p>
             </div>
             <div class="text-right">
-              <h2 class="text-lg font-semibold text-gray-800">Your Company Name</h2>
-              <p class="text-xs text-gray-500">Jl. Jenderal Sudirman No. 123, Jakarta</p>
+              <h2 class="text-lg font-semibold text-gray-800"> XYZ</h2>
+              <p class="text-xs text-gray-500">Jl. XYZ</p>
             </div>
           </header>
 
@@ -279,7 +279,7 @@ export default function TravelPackagePopularityReport() {
           </div>
 
           <footer class="text-center text-xs text-gray-400 mt-8 pt-4 border-t">
-            <p>Confidential &copy; ${new Date().getFullYear()} Your Company Name</p>
+            <p>Confidential &copy; ${new Date().getFullYear()}  XYZ</p>
           </footer>
         </div>
       </body>

@@ -26,19 +26,23 @@ export default function DetailBookingPage() {
       window.snap.pay(snapToken, {
         onSuccess: (result: any) => {
           toast.success(`Payment Success!`);
-          navigate('/payment-vehicle-finish', { 
-            state: { transactionResult: result } 
+          navigate("/payment-finish", {
+            state: {
+              transactionResult: result,
+              bookingId: bookingData?.data.id,
+              bookingType: "vehicle", 
+            },
           });
         },
         onPending: (result: any) => {
           toast.warning(`Waiting for payment.`);
-          navigate('/payment/pending', {
-            state: { transactionResult: result }
+          navigate("/payment/pending", {
+            state: { transactionResult: result },
           });
         },
         onError: () => {
           toast.error(`Payment failed. Please try again.`);
-          navigate('/payment/error');
+          navigate("/payment/error");
         },
         onClose: () => {
           toast.info("You closed the payment pop-up.");
@@ -92,7 +96,7 @@ export default function DetailBookingPage() {
   if (isLoading) return <LoadingSpinner />;
   if (bookingError) {
     toast.error("Failed to load booking details.");
-    return <LoadingSpinner />; 
+    return <LoadingSpinner />;
   }
   if (!bookingData?.data) return <LoadingSpinner />;
 

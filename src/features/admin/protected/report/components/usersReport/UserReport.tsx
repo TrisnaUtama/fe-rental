@@ -274,7 +274,7 @@ export default function UsersAndDriversReport() {
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">User Details</h2>
                 <div class="overflow-x-auto">${tableHtml}</div>
             </main>
-            <footer class="text-center text-xs text-gray-400 mt-8 pt-4 border-t"><p>Confidential &copy; ${new Date().getFullYear()} Your Company Name</p></footer>
+            <footer class="text-center text-xs text-gray-400 mt-8 pt-4 border-t"><p>Confidential &copy; ${new Date().getFullYear()} XYZ</p></footer>
           </div>
         </body>
         </html>
