@@ -168,6 +168,12 @@ export default function FinancialSummaryReport() {
     error: monthlySummaryError 
   } = useMonthlyFinancialSummary(monthlySummaryYear);
 
+
+  console.log( "data: ", {
+  financialSummaryResponse,
+  promoUsageReportResponse
+  })
+
   const summary: IFinancialSummary | null | undefined = financialSummaryResponse?.data;
   const promoUsage: IPromoUsageReport | null | undefined = promoUsageReportResponse?.data;
   const monthlySummaryData: IMonthlyFinancialSummaryItem[] = 
