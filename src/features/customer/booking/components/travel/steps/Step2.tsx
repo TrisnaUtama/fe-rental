@@ -213,7 +213,6 @@ export function Step2_TravelPackReview() {
       }
     }
   };
-
   const endDate = addDays(departureDate, travelPack.duration - 1);
 
   const groupedItinerary = useMemo(() => {
@@ -240,7 +239,6 @@ export function Step2_TravelPackReview() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-12 items-start">
-            {/* Left Column: All Details, Preferences, and Notes */}
             <div className="lg:col-span-2 space-y-8">
             <Card className="rounded-xl shadow-md">
                 <CardHeader className="border-b">

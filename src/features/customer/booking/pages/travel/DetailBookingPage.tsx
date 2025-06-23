@@ -48,7 +48,6 @@ export default function DetailBookingPage() {
       toast.error("Midtrans script not loaded. Please refresh the page.");
     }
   };
-  // --- END OF UPDATED SECTION ---
 
   const handlePayment = async () => {
     if (!bookingData?.data) {

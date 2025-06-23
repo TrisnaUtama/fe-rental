@@ -21,6 +21,7 @@ import type {
   IPromoUsageReport,
   ITravelPackagePopularityReport,
   IDailyBusinessSummaryItem,
+  IMonthlyFinancialSummaryItem,
 } from "../types/report";
 
 const API_REPORTS_BASE_URL = `${import.meta.env.VITE_API_KEY}reports/`;
@@ -75,6 +76,21 @@ export const ReportsService = {
     });
     return await httpRequest<IResponseGlobal<IFinancialSummary>>(
       `${API_REPORTS_BASE_URL}financial-summary?${params.toString()}`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+  },
+
+  async getMonthlyFinancialSummary(
+    year: number | string
+  ): Promise<IResponseGlobal<IMonthlyFinancialSummaryItem[]>> {
+    const params = new URLSearchParams({
+      year: String(year),
+    });
+    return await httpRequest<IResponseGlobal<IMonthlyFinancialSummaryItem[]>>(
+      `${API_REPORTS_BASE_URL}monthly-financial-summary?${params.toString()}`,
       {
         method: "GET",
         credentials: "include",

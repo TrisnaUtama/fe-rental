@@ -21,6 +21,7 @@ import type {
   IPromoUsageReport,
   ITravelPackagePopularityReport,
   IDailyBusinessSummaryItem,
+  IMonthlyFinancialSummaryItem,
 } from "../types/report";
 
 /**
@@ -65,6 +66,17 @@ export function useFinancialSummary(filters: {
     ],
     queryFn: () => ReportsService.getFinancialSummary(startDate!, endDate!),
     enabled: !!startDate && !!endDate,
+  });
+}
+
+
+export function useMonthlyFinancialSummary(
+  year?: number | string
+): UseQueryResult<IResponseGlobal<IMonthlyFinancialSummaryItem[]>> {
+  return useQuery({
+    queryKey: ["reports", "monthlyFinancialSummary", year],
+    queryFn: () => ReportsService.getMonthlyFinancialSummary(year!),
+    enabled: !!year, 
   });
 }
 

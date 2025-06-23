@@ -85,7 +85,14 @@ export interface OTPs {
   created_at: string; 
 }
 
-
+export interface IMonthlyFinancialSummaryItem {
+  id: string;
+  month: string;
+  monthIndex: number;
+  totalPaidAmount: number;
+  totalRefundedAmount: number;
+  netRevenue: number;
+}
 
 export interface Users {
   id: string;
