@@ -3,14 +3,17 @@ import { useAllBookingById } from "../../hooks/useBooking";
 import LoadingSpinner from "@/features/redirect/pages/Loading";
 import { BookingDetailPage } from "../../components/vehicle/detailBooking/DetailBookingComponent";
 import { useAuthContext } from "@/shared/context/authContex";
-import { MidtransScriptLoader } from "@/shared/components/MidtransLoader";
+import { MidtransTrigger } from "@/shared/components/MidtransLoader";
 import { useUpdatePayment } from "../../hooks/usePayment";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export default function DetailBookingPage() {
   const { accessToken } = useAuthContext();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  const [snapToken, setSnapToken] = useState<string | null>(null);
 
   const {
     data: bookingData,
@@ -19,39 +22,7 @@ export default function DetailBookingPage() {
   } = useAllBookingById(id ?? "", accessToken ?? "");
   const { mutateAsync: updatePayment } = useUpdatePayment(accessToken ?? "");
   const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
-  const handleBack = () => navigate("/list-booking-vehicle");;
-
-  const openSnapPopup = (snapToken: string) => {
-    if (window.snap) {
-      window.snap.pay(snapToken, {
-        onSuccess: (result: any) => {
-          toast.success(`Payment Success!`);
-          navigate("/payment-finish", {
-            state: {
-              transactionResult: result,
-              bookingId: bookingData?.data.id,
-              bookingType: "vehicle", 
-            },
-          });
-        },
-        onPending: (result: any) => {
-          toast.warning(`Waiting for payment.`);
-          navigate("/payment/pending", {
-            state: { transactionResult: result },
-          });
-        },
-        onError: () => {
-          toast.error(`Payment failed. Please try again.`);
-          navigate("/payment/error");
-        },
-        onClose: () => {
-          toast.info("You closed the payment pop-up.");
-        },
-      });
-    } else {
-      toast.error("Midtrans script not loaded. Please refresh the page.");
-    }
-  };
+  const handleBack = () => navigate("/list-booking-vehicle");
 
   const handlePayment = async () => {
     if (!bookingData?.data) {
@@ -59,52 +30,82 @@ export default function DetailBookingPage() {
       return;
     }
 
-    const paymentInfo = bookingData.data.Payments![0];
+    const paymentInfo = bookingData.data.Payments?.[0];
     if (!paymentInfo) {
-      toast.error("Payment information not found for this booking.");
+      toast.error("Payment information not found.");
       return;
     }
-    if (!clientKey) {
-      toast.error("Payment gateway client key is missing. Contact support.");
-      return;
-    }
+
     try {
-      const existingToken = paymentInfo.token;
       const tokenExpiry = paymentInfo.expiry_date
         ? new Date(paymentInfo.expiry_date)
         : null;
 
-      if (existingToken && tokenExpiry && tokenExpiry > new Date()) {
-        openSnapPopup(existingToken);
+      if (
+        paymentInfo.token &&
+        tokenExpiry &&
+        tokenExpiry > new Date()
+      ) {
+        setSnapToken(paymentInfo.token);
         return;
       }
+
       const response = await updatePayment({ id: id! });
       const newSnapToken = response.data.token;
+
       if (!newSnapToken) {
-        throw new Error("Failed to retrieve Snap token from the server.");
+        throw new Error("Failed to retrieve Snap token.");
       }
-      openSnapPopup(newSnapToken);
+
+      setSnapToken(newSnapToken); 
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
-        "Error while processing payment.";
+        "Error processing payment.";
       toast.error(errorMessage);
     }
   };
 
   if (isLoading) return <LoadingSpinner />;
   if (bookingError) {
-    toast.error("Failed to load booking details.");
+    toast.error("Failed to load booking.");
     return <LoadingSpinner />;
   }
-  if (!bookingData?.data) return <LoadingSpinner />;
 
   return (
     <>
-      <MidtransScriptLoader clientKey={clientKey} />
+      {snapToken && (
+        <MidtransTrigger
+          clientKey={clientKey}
+          transactionToken={snapToken}
+          onSuccess={(result) => {
+            toast.success("Payment success!");
+            navigate("/payment-finish", {
+              state: {
+                transactionResult: result,
+                bookingId: bookingData?.data.id,
+                bookingType: "vehicle",
+              },
+            });
+          }}
+          onPending={(result) => {
+            toast.warning("Payment pending.");
+            navigate("/payment/pending", {
+              state: { transactionResult: result },
+            });
+          }}
+          onError={() => {
+            toast.error("Payment error.");
+            navigate("/payment/error");
+          }}
+          onClose={() => {
+            toast.info("Payment popup closed.");
+          }}
+        />
+      )}
       <BookingDetailPage
-        booking={bookingData.data}
+        booking={bookingData!.data}
         onBack={handleBack}
         onPayment={handlePayment}
       />
