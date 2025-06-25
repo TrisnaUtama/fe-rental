@@ -20,6 +20,7 @@ import CreatePromoPage from "@/features/admin/protected/promo/pages/createPage";
 import UpdatePromoPage from "@/features/admin/protected/promo/pages/updatePage";
 import ProfileIndex from "@/features/admin/protected/user/pages/Profile";
 import ProfileIndexCustomer from "@/features/customer/profile/pages/profile";
+import {RateDestinationsPage} from "@/features/rating/Rating"
 
 export const pageRoutes = [
   {
@@ -98,6 +99,11 @@ export const customerRoute = [
   {
     path: "/booking-vehicle",
     element: BookingPageVehicle,
+    roles: ["CUSTOMER"],
+  },
+  {
+    path: "/rating",
+    element: RateDestinationsPage,
     roles: ["CUSTOMER"],
   },
   {

@@ -13,7 +13,7 @@ export default defineConfig({
   },
   server: {
     host: true,
-    allowedHosts: ["fe.trisnautama.site"],
+    allowedHosts: ["test_fe.trisnautama.site"],
     watch: {
       usePolling: true,
     },
