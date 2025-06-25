@@ -22,7 +22,7 @@ export default function DetailBookingPage() {
   } = useAllBookingById(id ?? "", accessToken ?? "");
   const { mutateAsync: updatePayment } = useUpdatePayment(accessToken ?? "");
   const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
-  const handleBack = () => navigate("/list-booking-vehicle");
+  const handleBack = () => navigate("/list-booking-travel");
 
   const handlePayment = async () => {
     if (!bookingData?.data) {
@@ -42,7 +42,7 @@ export default function DetailBookingPage() {
         : null;
 
       if (paymentInfo.token && tokenExpiry && tokenExpiry > new Date()) {
-        setSnapToken(paymentInfo.token); // ⬅️ trigger MidtransTrigger
+        setSnapToken(paymentInfo.token); 
         return;
       }
 
@@ -53,7 +53,7 @@ export default function DetailBookingPage() {
         throw new Error("Failed to retrieve Snap token.");
       }
 
-      setSnapToken(newSnapToken); // ⬅️ trigger MidtransTrigger
+      setSnapToken(newSnapToken);
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message ||
@@ -81,7 +81,7 @@ export default function DetailBookingPage() {
               state: {
                 transactionResult: result,
                 bookingId: bookingData?.data.id,
-                bookingType: "vehicle",
+                bookingType: "travel",
               },
             });
           }}

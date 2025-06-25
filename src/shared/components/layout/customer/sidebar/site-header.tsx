@@ -98,7 +98,7 @@ export function SiteHeader() {
           </Button>
            <Link to="/" className="flex items-center gap-2 text-xl font-bold">
               <div className="w-8 h-8 bg-blue-600 text-white flex items-center justify-center rounded-lg font-mono">B</div>
-              <span className={clsx(scrolled ? "text-gray-900" : "text-white")}>BaliRent</span>
+              <span className={clsx(scrolled ? "text-gray-900" : "text-white")}>XYZ</span>
             </Link>
         </div>
 

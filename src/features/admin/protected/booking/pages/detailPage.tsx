@@ -123,7 +123,7 @@ export default function DetailPage() {
       toast.error(
         `Failed to assign vehicle: ${error.message || "Unknown error"}`
       );
-      throw new Error(`Failed to assign vehicle : ${error.message}`);
+      throw new Error(`Failed to assign vehicle : error.message}`);
     }
   };
 

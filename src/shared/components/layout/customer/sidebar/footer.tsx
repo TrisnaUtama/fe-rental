@@ -30,7 +30,7 @@ export default function Footer() {
                         <div className="bg-blue-600 p-2 rounded-lg">
                             <CarFront className="h-6 w-6 text-white" />
                         </div>
-                        <span className="text-2xl font-bold">BaliRent</span>
+                        <span className="text-2xl font-bold">XYZ</span>
                     </Link>
                     <p className="text-gray-400">Your trusted partner for exploring the beauty of Bali with freedom and confidence.</p>
                     <div className="flex space-x-3 pt-2">
@@ -64,14 +64,14 @@ export default function Footer() {
                     <h3 className="text-lg font-semibold mb-4 text-white">Contact Info</h3>
                     <div className="space-y-4 text-gray-400">
                         <div className="flex items-start"><Phone className="h-4 w-4 mr-3 mt-1 flex-shrink-0" /><span>+62 361 123 4567</span></div>
-                        <div className="flex items-start"><Mail className="h-4 w-4 mr-3 mt-1 flex-shrink-0" /><span>info@balirent.com</span></div>
+                        <div className="flex items-start"><Mail className="h-4 w-4 mr-3 mt-1 flex-shrink-0" /><span>info@xyz.com</span></div>
                         <div className="flex items-start"><MapPin className="h-4 w-4 mr-3 mt-1 flex-shrink-0" /><span>Denpasar, Bali, Indonesia</span></div>
                     </div>
                 </motion.div>
             </div>
 
             <div className="border-t border-gray-800 mt-10 pt-8 text-center text-sm text-gray-500">
-                <p>&copy; {new Date().getFullYear()} BaliRent by Jacky. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} PT. XYZ. All rights reserved.</p>
             </div>
         </motion.div>
     </footer>

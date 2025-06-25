@@ -188,10 +188,10 @@ export default function CreateAccomodationForm() {
             <div className="p-2 bg-black text-white rounded-lg">
               <MapPin className="h-6 w-6" />
             </div>
-            Create New Destination
+            Create Accomodation
           </CardTitle>
           <CardDescription className="text-base">
-            Add a new destination to your fleet with detailed specifications and
+            Add a new accomodation to your fleet with detailed specifications and
             images
           </CardDescription>
         </CardHeader>

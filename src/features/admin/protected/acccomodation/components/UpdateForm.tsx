@@ -307,10 +307,10 @@ export default function UpdateAccomodationForm() {
             <div className="p-2 bg-black text-white rounded-lg">
               <MapPin className="h-6 w-6" />
             </div>
-            Update Destination
+            Update Accomodation
           </CardTitle>
           <CardDescription className="text-base">
-           Update destination to your fleet with detailed specifications and
+           Update accomodation to your fleet with detailed specifications and
             images
           </CardDescription>
         </CardHeader>
