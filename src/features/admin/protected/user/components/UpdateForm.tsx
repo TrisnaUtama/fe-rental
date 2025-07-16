@@ -130,10 +130,10 @@ export default function UpdateUserForm() {
           <CardHeader className="bg-white border-b">
             <CardTitle className="text-xl font-semibold flex items-center gap-2">
               <User className="h-5 w-5" />
-              Create New User
+              Update User
             </CardTitle>
             <CardDescription>
-              Fill in the details below to create a new user account
+              Fill in the details below to update a  user account
             </CardDescription>
           </CardHeader>
           <CardContent className="bg-white p-6">

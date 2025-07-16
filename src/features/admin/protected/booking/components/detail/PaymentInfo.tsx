@@ -48,28 +48,18 @@ const SpecItem = ({
 );
 
 export const PaymentInfo = ({ booking }: { booking: BookingResponse }) => (
-  <Card className="rounded-2xl shadow-sm">
-    <CardHeader>
-      <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-        <Wallet className="w-5 h-5 text-blue-500" />
-        Payment Information
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="p-6">
-      {booking.Payments && booking.Payments.length > 0 ? (
-        <div className="space-y-4">
-          {booking.Payments.map((payment, index) => (
-            <div
-              key={payment.id || index}
-              className="border p-4 rounded-lg bg-gray-50"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <SpecItem
-                  icon={DollarSign}
-                  label="Amount Paid"
-                  value={formatRupiah(payment.total_amount)}
-                />
-                <SpecItem
+    <Card className="rounded-2xl shadow-sm">
+        <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2"><Wallet className="w-5 h-5 text-blue-500"/>Payment Information</CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+            {booking.Payments && booking.Payments.length > 0 ? (
+                <div className="space-y-4">
+                    {booking.Payments.map((payment, index) => (
+                        <div key={payment.id || index} className="border p-4 rounded-lg bg-gray-50">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <SpecItem icon={DollarSign} label="Amount Paid" value={formatRupiah(payment.total_amount)} />
+                                <SpecItem
                   icon={Info}
                   label="Payment Status"
                   value={
@@ -81,27 +71,13 @@ export const PaymentInfo = ({ booking }: { booking: BookingResponse }) => (
                     </Badge>
                   }
                 />
-                <SpecItem
-                  icon={Calendar}
-                  label="Payment Date"
-                  value={formatDate(payment.created_at)}
-                />
-                {payment.payment_method && (
-                  <SpecItem
-                    icon={Wallet}
-                    label="Payment Method"
-                    value={payment.payment_method}
-                  />
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-gray-500 text-center py-4">
-          No payment information available.
-        </p>
-      )}
-    </CardContent>
-  </Card>
+                                <SpecItem icon={Calendar} label="Payment Date" value={formatDate(payment.created_at)} />
+                                {payment.payment_method && <SpecItem icon={Wallet} label="Payment Method" value={payment.payment_method} />}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (<p className="text-gray-500 text-center py-4">No payment information available.</p>)}
+        </CardContent>
+    </Card>
 );

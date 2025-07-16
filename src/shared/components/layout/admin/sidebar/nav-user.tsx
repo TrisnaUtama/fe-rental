@@ -77,37 +77,9 @@ export function NavUser({
 
   
   const handleLogout = async () => {
-    try {
-      const result = await Auth.signOut(user.id!, token!);
-      if (
-        result.meta.requestStatus === "fulfilled" &&
-        result.payload
-      ) {
-        logout();
-        Auth.logout();
-        toast.success("Success", {
-          description: "Successfully Sign Out",
-          position: "bottom-right",
-          duration: 3000,
-          style: {
-            backgroundColor: "#16a34a",
-            color: "white",
-          },
-        });
-        navigate("/");
-      } else {
-        toast.error("Sign Out failed", {
-          description: result.payload?.toString() || "Something Went Wrong",
-          position: "bottom-right",
-        });
-      }
-    } catch (err: any) {
-      toast.error(`Failed Sign Out`, {
-        description: err.message || "Invalid credentials",
-        position: "bottom-right",
-      });
-    }
-  };
+   logout();
+   toast.success("Successfully logged out");  
+  }
 
   return (
     <SidebarMenu>

@@ -191,7 +191,9 @@ export default function CreateForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
-      console.log(fieldErrors);
+	toast.error("Failed", {
+          description: `${fieldErrors}`,
+        });
     }
 
     try {

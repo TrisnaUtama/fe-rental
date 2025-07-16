@@ -14,8 +14,7 @@ export default function Index() {
   useEffect(() => {
     if (data?.data) {
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
+	today.setHours(0, 0, 0, 0); 
       const filteredBookings = data.data.filter((booking) => {
         const isStatusRelevant = booking.status === "CONFIRMED" || booking.status === "RESCHEDULED";
 
