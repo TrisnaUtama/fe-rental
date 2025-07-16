@@ -24,12 +24,11 @@ export const statusConfig: Record<BookingStatus, { label: string; icon: React.El
   COMPLETE: { label: "Complete", icon: CheckCircle, className: "bg-green-100 text-green-700 border-green-200" },
   CANCELED: { label: "Canceled", icon: XCircle, className: "bg-red-100 text-red-700 border-red-200" },
   
-  // Specific Rejection Statuses
+  
   REJECTED_BOOKING: { label: "Booking Rejected", icon: ThumbsDown, className: "bg-red-200 text-red-800 border-red-300" },
   REJECTED_REFUND: { label: "Refund Rejected", icon: XCircle, className: "bg-red-200 text-red-800 border-red-300" },
   REJECTED_RESHEDULE: { label: "Reschedule Rejected", icon: ThumbsDown, className: "bg-red-200 text-red-800 border-red-300" },
 
-  // Request & Confirmation Statuses
   RESCHEDULE_REQUESTED: { label: "Reschedule Pending", icon: Hourglass, className: "bg-purple-100 text-purple-700 border-purple-200" },
   RESCHEDULED: { label: "Rescheduled", icon: RefreshCw, className: "bg-indigo-100 text-indigo-700 border-indigo-200" },
   REFUND_REQUESTED: { label: "Refund Pending", icon: Hourglass, className: "bg-pink-100 text-pink-700 border-pink-200" },
@@ -37,11 +36,12 @@ export const statusConfig: Record<BookingStatus, { label: string; icon: React.El
 };
 
 interface StatusBadgeProps {
-  status: BookingStatus;
+  status?: BookingStatus;
+  payment_status?: string
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  const config = statusConfig[status] || statusConfig.SUBMITTED;
+  const config = statusConfig[status!] || statusConfig.SUBMITTED;
   const Icon = config.icon;
 
   return (

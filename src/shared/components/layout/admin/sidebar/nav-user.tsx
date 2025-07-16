@@ -81,8 +81,7 @@ export function NavUser({
       const result = await Auth.signOut(user.id!, token!);
       if (
         result.meta.requestStatus === "fulfilled" &&
-        result.payload &&
-        typeof result.payload != "string"
+        result.payload
       ) {
         logout();
         Auth.logout();

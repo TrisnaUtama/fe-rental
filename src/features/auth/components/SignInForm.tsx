@@ -70,7 +70,7 @@ export default function SignInForm() {
           },
         });
         if(user.role === "CUSTOMER"){
-          navigate("/car-rental", {
+          navigate("/rating", {
             replace: true,
           });
         }else{

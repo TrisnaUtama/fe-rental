@@ -14,7 +14,7 @@ const getDayDifference = (start: string, end: string) => {
   const diffTime = Math.abs(
     new Date(end).getTime() - new Date(start).getTime()
   );
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24) + 1) || 1;
 };
 
 const SummaryRow = ({ label, value, isDiscount = false }: { label: string; value: string; isDiscount?: boolean; }) => (
