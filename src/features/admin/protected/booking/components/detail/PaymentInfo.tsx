@@ -3,6 +3,7 @@ import { Wallet, DollarSign, Info, Calendar } from "lucide-react";
 import type { BookingResponse, BookingStatus } from "../../types/booking.type";
 import { StatusBadge } from "@/features/customer/booking/components/vehicle/list/StatusBadge";
 import React from "react";
+import { Badge } from "@/shared/components/ui/badge";
 
 const formatDate = (dateString: string | null | undefined) => { if (!dateString) return "N/A"; try { return new Date(dateString).toLocaleString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }); } catch (error) { return "Invalid Date"; } };
 const formatRupiah = (value: string | number | null | undefined) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(value));
@@ -20,7 +21,18 @@ export const PaymentInfo = ({ booking }: { booking: BookingResponse }) => (
                         <div key={payment.id || index} className="border p-4 rounded-lg bg-gray-50">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <SpecItem icon={DollarSign} label="Amount Paid" value={formatRupiah(payment.total_amount)} />
-                                <SpecItem icon={Info} label="Payment Status" value={<StatusBadge status={payment.payment_status as BookingStatus} />} />
+                                <SpecItem
+                  icon={Info}
+                  label="Payment Status"
+                  value={
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1.5 bg-gray-100 text-gray-700 border-gray-200"
+                    >
+                      {payment.payment_status}
+                    </Badge>
+                  }
+                />
                                 <SpecItem icon={Calendar} label="Payment Date" value={formatDate(payment.created_at)} />
                                 {payment.payment_method && <SpecItem icon={Wallet} label="Payment Method" value={payment.payment_method} />}
                             </div>

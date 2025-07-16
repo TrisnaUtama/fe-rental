@@ -14,7 +14,7 @@ const formatRupiah = (value: string | number) => new Intl.NumberFormat("id-ID", 
 const getDayDifference = (start: string, end: string) => {
   if (!start || !end) return 1;
   const diffTime = Math.abs(new Date(end).getTime() - new Date(start).getTime());
-  const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24) + 1);
   return days > 0 ? days : 1;
 };
 

@@ -19,6 +19,19 @@ import { useAuthContext } from "@/shared/context/authContex";
 import { useAppSelector } from "@/shared/hooks/hooks";
 import { useAuth } from "../hooks/useAuth";
 
+// Your interface definition
+export interface IAuthResponse {
+  success: boolean;
+  message: string;
+  data?: { // Make data optional to handle failed logins
+    user_id: string;
+    role: string;
+    email: string;
+    name: string;
+  };
+  access_token?: string; // Make token optional
+}
+
 export default function SignInForm() {
   const status = useAppSelector((state) => state.auth.status);
   const Auth = useAuth();
@@ -38,64 +51,69 @@ export default function SignInForm() {
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
+  // =========================================================================
+  // FINAL CORRECTED LOGIC
+  // =========================================================================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
+
     try {
       const result = await Auth.signIn(form.email, form.password);
-      if (
-        result.meta.requestStatus === "fulfilled" &&
-        result.payload &&
-        typeof result.payload != "string"
-      ) {
-        const res = result.payload;
-        const user = {
-          id: res.data.user_id,
-          role: res.data.role,
-          email: res.data.email,
-          name: res.data.name,
-        };
-        const token = { access_token: res.access_token };
-        if (!token) {
-          throw new Error("Access token is missing in the response");
+
+      if (result.meta.requestStatus === "fulfilled" && result.payload) {
+        let res: IAuthResponse;
+
+        // =========================================================================
+        // FINAL FIX: Check if payload is a string before parsing.
+        // If it's already an object, just use it.
+        // =========================================================================
+        if (typeof result.payload === "string") {
+          res = JSON.parse(result.payload);
+        } else {
+          res = result.payload as IAuthResponse; // It's already the object we need
         }
-        login(user, token.access_token);
-        toast.success("Success", {
-          description: `Welcome ${res.data.name}`,
-          position: "bottom-right",
-          duration: 3000,
-          style: {
-            backgroundColor: "#16a34a",
-            color: "white",
-          },
-        });
-        if(user.role === "CUSTOMER"){
-          navigate("/car-rental", {
-            replace: true,
+
+        if (res.success === true && res.data && res.access_token) {
+          // --- SUCCESS PATH ---
+          const user = {
+            id: res.data.user_id,
+            role: res.data.role,
+            email: res.data.email,
+            name: res.data.name,
+          };
+
+          login(user, res.access_token);
+          
+          toast.success("Success", {
+            description: `Welcome ${res.data.name}`,
+            position: "bottom-right",
           });
-        }else{
-          navigate("/staff/dashboard", {
-            replace: true,
-          });
+
+          if (user.role === "CUSTOMER") {
+            navigate("/car-rental", { replace: true });
+          } else {
+            navigate("/staff/dashboard", { replace: true });
+          }
+        } else {
+          // --- FAILURE PATH ---
+          setFieldErrors((prev) => ({
+            ...prev,
+            general: res.message || "Invalid credentials.",
+          }));
         }
-      } else {
-        toast.error("Login failed", {
-          description: result.payload?.toString() || "Invalid credentials",
-          position: "bottom-right",
-        });
-      }
-    } catch (err: any) {
-      if (err?.errors && typeof err.errors === "object") {
-        setFieldErrors((prev: any) => ({
-          ...prev,
-          ...err.errors,
-        }));
       } else {
         setFieldErrors((prev) => ({
           ...prev,
-          general: err.message || "Unknown error",
+          general: "Login failed. Please try again.",
         }));
       }
+    } catch (err: any) {
+      console.error("A critical error occurred:", err);
+      setFieldErrors((prev) => ({
+        ...prev,
+        general: "An unknown error occurred. Please try again.",
+      }));
     }
   };
 
